@@ -1,0 +1,16 @@
+# 추후 Spring쪽으로 옮기기
+
+version: "3.8"
+services:
+  mongodb:
+    image: mongo
+    container_name: mongoDB
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:  
+      - ./data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234 
+      - MONGO_INITDB_DATABASE=LEAGUEDATA

@@ -1,0 +1,12 @@
+# monogoDB 
+/data
+
+
+# python
+/__pycache__
+
+
+# environment
+.env
+
+
