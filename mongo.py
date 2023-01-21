@@ -13,3 +13,13 @@ mongoClient = MongoClient(
   username=username,
   password=password
 )
+
+def clear(database, clearCollectionList=[]):
+  
+  if len(clearCollectionList)!=0:
+    for collection in clearCollectionList:
+      mongoClient[database][collection].delete_many({})
+  
+  else:
+    for collection in mongoClient[database].list_collection_names():
+      mongoClient[database][collection].delete_many({})
