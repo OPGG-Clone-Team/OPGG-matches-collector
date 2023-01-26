@@ -10,6 +10,8 @@ password = os.getenv("MONGO_PASSWORD")
 mongoClient = MongoClient(
   host=host,
   port=port,
+  username=username,
+  password=password,
 )
 
 def clear(database, clearCollectionList=[]):
