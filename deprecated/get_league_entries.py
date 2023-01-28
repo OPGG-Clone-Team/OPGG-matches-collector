@@ -5,8 +5,8 @@
 import dotenv
 dotenv.load_dotenv(override=True) # .env file 로드
 
-from riot_requests.riot_requests import league_v4, getSummoner
-from mongo import mongoClient
+from riot_requests.riot_requests import league_exp_v4, getSummoner
+from config.mongo import mongoClient
 
 db=mongoClient.LEAGUEDATA
 

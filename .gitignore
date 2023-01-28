@@ -3,8 +3,9 @@
 
 
 # python
-/__pycache__
-
+__pycache__/
+__pycache__/*
+!.__pycache__/*
 
 # environment
 .env
