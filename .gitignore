@@ -15,3 +15,8 @@ test.py
 
 # vscode setting file
 .vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
