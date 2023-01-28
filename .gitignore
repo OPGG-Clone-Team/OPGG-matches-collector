@@ -12,3 +12,6 @@
 
 # simple test file
 test.py
+
+# vscode setting file
+.vscode/
