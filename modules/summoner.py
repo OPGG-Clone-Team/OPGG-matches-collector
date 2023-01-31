@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 # 추후 환경변수 로드하는 공통로직 분리하기
 from config import mongo as mongo
 from riot_requests import summoner_v4
-from trycatch_wrapper import trycatch
+from decorator.trycatch_wrapper import trycatch
 
 # LEAGUEDATA db의 summoners만 담당
 db = mongo.mongoClient.LEAGUEDATA
@@ -36,4 +36,4 @@ def update(summonerName):
   print(f"소환사 {summonerName}의 정보를 성공적으로 업데이트했습니다.")
 
 if __name__=="__main__":
-  update("Hide on bush")
+  update("칼과 창 방패")

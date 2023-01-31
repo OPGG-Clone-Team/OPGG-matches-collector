@@ -26,9 +26,10 @@ def getSummoner(summonerId):
 
   # 추후 logging 적용
   print(f'다음으로 request : {url}')
-  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}).json()
+  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}, timeout = 10).json()
   
-  if "id" not in result:
+  #TODO 예외처리 깔끔하게 하기
+  if "id" not in result and "status" in result:
     return None
   
   return result

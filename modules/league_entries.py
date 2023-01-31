@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 # 추후 환경변수 로드하는 공통로직 분리하기
 from config import mongo as mongo
 from riot_requests import league_v4
-from trycatch_wrapper import trycatch
+from decorator.trycatch_wrapper import trycatch
 
 # LEAGUEDATA db의 league_entries collection만 담당
 db = mongo.mongoClient.LEAGUEDATA

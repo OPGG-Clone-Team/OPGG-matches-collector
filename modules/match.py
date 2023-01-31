@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 # 추후 환경변수 로드하는 공통로직 분리하기
 from config import mongo as mongo
 from riot_requests import match_v4
-from trycatch_wrapper import trycatch
+from decorator.trycatch_wrapper import trycatch
 
 db = mongo.mongoClient.LEAGUEDATA
 
@@ -27,5 +27,5 @@ def update(matchId):
   print("매치정보를 모두 저장했습니다.")
   
 if __name__=="__main__":
-  update("KR_waefweafawe")
+  update("KR_6336134778")
     

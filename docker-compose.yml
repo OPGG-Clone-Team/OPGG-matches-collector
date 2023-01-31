@@ -7,9 +7,9 @@ services:
     container_name: mongoDB
     restart: always
     ports:
-      - 27018:27017
+      - 27017:27017
     volumes:  
-      - ./data:/data/db
+      - ./data:/data/db # 로컬 디렉토리 하위의 ./data와ㅏ 컨테이너 안의 /data/db를 매핑
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=1234 
