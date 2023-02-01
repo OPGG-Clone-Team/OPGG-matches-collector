@@ -36,4 +36,4 @@ def update(summonerName):
   print(f"소환사 {summonerName}의 정보를 성공적으로 업데이트했습니다.")
 
 if __name__=="__main__":
-  update("칼과 창 방패")
+  update("Hide on bush")
