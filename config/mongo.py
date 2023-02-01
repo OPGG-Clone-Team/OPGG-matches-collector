@@ -61,7 +61,7 @@ def create_initial_indexes():
   db.summoner_matches.create_indexes([summoner_matches_index])
   db.matches.create_indexes([matches_index])
   db.participants.create_indexes([participants_index])
-  db.temas.create_indexes([teams_index])
+  db.teams.create_indexes([teams_index])
   
   
   
