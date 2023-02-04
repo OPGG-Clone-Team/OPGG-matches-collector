@@ -1,20 +1,16 @@
-# 상위 경로 패키지 로드
-import sys, os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
-# 추후 환경변수 로드하는 공통로직 분리하기
-from config import mongo as mongo
+from config.mongo import mongoClient
 from riot_requests import summoner_v4
 from decorator.trycatch_wrapper import trycatch
+from flask import jsonify
 
 # LEAGUEDATA db의 summoners만 담당
-db = mongo.mongoClient.LEAGUEDATA
 col = "summoners"
 
 @trycatch
-def update(summonerName):
+def update(app, summonerName): #app을 받아야함
+  db = mongoClient(app).LEAGUEDATA
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
-  summoner_brief = db.league_entries.find_one({"summonerName":summonerName})
+  summoner_brief = db["league_entries"].find_one({"summonerName":summonerName})
   
   # 1-1. 없다면 raise Exception
   if not summoner_brief:
@@ -33,7 +29,24 @@ def update(summonerName):
       {"puuid":summoner["puuid"]},
       {"$set":summoner},
       True)
+  
   print(f"소환사 {summonerName}의 정보를 성공적으로 업데이트했습니다.")
+  
+  return summoner
+
+@trycatch
+def findSummoner(app, summonerName):
+  db = mongoClient(app).LEAGUEDATA
+  # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
+  summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})
+  
+  if not summoner:
+    return None
+  
+  return summoner
 
 if __name__=="__main__":
+  # 상위 경로 패키지 로드
+  import sys, os
+  sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
   update("Hide on bush")

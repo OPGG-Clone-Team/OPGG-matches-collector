@@ -1,28 +1,15 @@
-from pymongo import MongoClient
+from pymongo import MongoClient,  IndexModel, ASCENDING, DESCENDING
 import os
-import dotenv
-from pymongo import IndexModel, ASCENDING, DESCENDING
-          # >>> index1 = IndexModel([("hello", DESCENDING),
-          # ...                      ("world", ASCENDING)], name="hello_world")
-          # >>> index2 = IndexModel([("goodbye", DESCENDING)])
-          # >>> db.test.create_indexes([index1, index2])
 
-dotenv.load_dotenv(override=True)
+def mongoClient(app=None):
+  if app:
+    mongoClient = MongoClient(app.config["MONGO_URI"])
+  else:
+    mongoClient = MongoClient(os.getenv("MONGO_URI"))
+  
+  return mongoClient
 
-host = os.getenv("MONGO_HOST")
-port = int(os.getenv("MONGO_PORT"))
-username = os.getenv("MONGO_USERNAME")
-password = os.getenv("MONGO_PASSWORD")
-
-mongoClient = MongoClient(
-  host=host,
-  port=port,
-  username=username,
-  password=password,
-)
-
-
-def create_initial_indexes():
+def create_initial_indexes(mongoClient):
   db = mongoClient.LEAGUEDATA
   
   # league_entries
@@ -64,10 +51,8 @@ def create_initial_indexes():
   db.teams.create_indexes([teams_index])
   
   
-  
-
 # TODO : 인덱스설정 등 초기설정은 추후 따로 분리할 것
-create_initial_indexes()
+# create_initial_indexes(mon)
 # # db.league_entries.create('summonerName', unique = True,)
 
 

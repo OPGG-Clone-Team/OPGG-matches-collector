@@ -26,6 +26,7 @@ def getSummoner(summonerId):
 
   # 추후 logging 적용
   print(f'다음으로 request : {url}')
+  print(os.getenv("RIOT_API_KEY_1"))
   result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}, timeout = 10).json()
   
   #TODO 예외처리 깔끔하게 하기

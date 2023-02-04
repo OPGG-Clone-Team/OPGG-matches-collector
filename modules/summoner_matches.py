@@ -1,18 +1,15 @@
-# 상위 경로 패키지 로드
-import sys, os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
 # 추후 환경변수 로드하는 공통로직 분리하기
-from config import mongo as mongo
+from config.mongo import mongoClient
 from riot_requests import match_v4
 from decorator.trycatch_wrapper import trycatch
 
 # LEAGUEDATA db의 summoner_matches만 담당
-db = mongo.mongoClient.LEAGUEDATA
+
 col = "summoner_matches"
 
 @trycatch
-def update(summonerName):
+def update(app, summonerName):
+  db = mongoClient(app).LEAGUEDATA
   summoner = db["summoners"].find_one({"name": summonerName})
   
   if not summoner:

@@ -8,6 +8,7 @@ __pycache__/*
 
 # environment
 .env
+config.json
 
 
 # simple test file
