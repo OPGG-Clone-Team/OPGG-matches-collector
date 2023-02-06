@@ -1,16 +1,15 @@
 from pymongo import MongoClient,  IndexModel, ASCENDING, DESCENDING
-import os
+from decorator.trycatch_wrapper import trycatch
 
-def mongoClient(app=None):
-  if app:
-    mongoClient = MongoClient(app.config["MONGO_URI"])
-  else:
-    mongoClient = MongoClient(os.getenv("MONGO_URI"))
+@trycatch
+def mongoClient(app):
+  mongoClient = MongoClient(app.config["MONGO_URI"])
+  create_initial_indexes(mongoClient.LEAGUEDATA)
   
   return mongoClient
 
-def create_initial_indexes(mongoClient):
-  db = mongoClient.LEAGUEDATA
+# TODO - 인덱스설정 등 초기설정은 추후 따로 분리할 것
+def create_initial_indexes(db):
   
   # league_entries
   league_entries_index = IndexModel([
@@ -43,32 +42,21 @@ def create_initial_indexes(mongoClient):
     ("teamId", ASCENDING),
   ],name = "teams_index")
   
+  timelines_index = IndexModel([
+    ("matchId", DESCENDING),
+    ("puuid", ASCENDING),
+    ("teamId", ASCENDING),
+    ("participantId", ASCENDING),
+  ],name = "timelines_index")
+  
   db.league_entries.create_indexes([league_entries_index])
   db.summoners.create_indexes([summoners_index])
   db.summoner_matches.create_indexes([summoner_matches_index])
   db.matches.create_indexes([matches_index])
   db.participants.create_indexes([participants_index])
   db.teams.create_indexes([teams_index])
+  db.timelines.create_indexes([timelines_index])
   
   
-# TODO : 인덱스설정 등 초기설정은 추후 따로 분리할 것
-# create_initial_indexes(mon)
-# # db.league_entries.create('summonerName', unique = True,)
 
-
-# def clear(database, clearCollectionList=[]):
-  # """mongodb database 모두 삭제
-
-  # Args:
-  #     database (str): 삭제하려는 mongoDB 데이터베이스명
-  #     clearCollectionList (list, optional): 비우려는 collection. 옵션을 주지 않으면 모든 콜렉션 비움
-  # """
-  
-  # if len(clearCollectionList)!=0:
-  #   for collection in clearCollectionList:
-  #     mongoClient[database][collection].delete_many({})
-  
-  # else:
-  #   for collection in mongoClient[database].list_collection_names():
-  #     mongoClient[database][collection].delete_many({})
       

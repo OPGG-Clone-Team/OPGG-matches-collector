@@ -1,5 +1,3 @@
-# 추후 환경변수 로드하는 공통로직 분리하기
-from config.mongo import mongoClient
 from riot_requests import match_v4
 from decorator.trycatch_wrapper import trycatch
 
@@ -8,16 +6,27 @@ from decorator.trycatch_wrapper import trycatch
 col = "summoner_matches"
 
 @trycatch
-def update(app, summonerName):
-  db = mongoClient(app).LEAGUEDATA
+def update(db, summonerName):
+  """
+  소환사의 최근 match Id 리스트를 DB에 업데이트
+
+  Args:
+      db (mongoClient): mongoDB connection
+      summonerName (String): 소환사이름
+
+  Raises:
+      Exception: _description_
+  
+  Returns:
+      puuid (str) : 소환사의 puuid
+  """
   summoner = db["summoners"].find_one({"name": summonerName})
   
+  # TODO 공통 에러처리
   if not summoner:
     raise Exception("유저를 찾을 수 없음")
 
   puuid = summoner["puuid"]
-
-  # TODO set대신에 가장 최근에 했던 게임정보(matchId) 하나만 저장해두고, 이후 Riot API 요청시 비교만 하도록 변경하기
   
   # 가장 최근 match id 가져오기
   old_matches = db[col].find_one({"puuid":puuid})
@@ -56,7 +65,33 @@ def update(app, summonerName):
           list(all_match_ids), reverse=True)}},
       True)
 
-  print(f'소환사 {summonerName}님의 matchId list가 업데이트되었습니다.')
-    
+  return summoner["puuid"]
+
+@trycatch
+def findRecentMatchIds(db, puuid, startIdx=0, size=30):
+  """
+  소환사의 최근 Match Id 리스트를 반환
+
+  Args:
+      db (connection): MongoDB connection
+      puuid (str): 소환사 puuid
+      startIdx (int, optional): 시작할 인덱스 위치. Defaults to 0.
+      size (int, optional): 가져올 Match Id 개수. Defaults to 30.
+
+  Returns:
+      matchIds(list): 소환사의 최근 Match Id 리스트
+  """
+  matchIds = db[col].find_one({"puuid":puuid})["summoner_match_ids"]
+  
+  if len(matchIds)==0:
+    return []
+  
+  else:
+    if len(matchIds)<size+startIdx:
+      return matchIds[startIdx:]
+    else:
+      return matchIds[startIdx:size+startIdx]
+  
+  
 if __name__=="__main__":
   update("칼과 창 방패")

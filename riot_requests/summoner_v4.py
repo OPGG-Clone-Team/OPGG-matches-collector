@@ -29,6 +29,10 @@ def getSummoner(summonerId):
   print(os.getenv("RIOT_API_KEY_1"))
   result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}, timeout = 10).json()
   
+  # 필요 없는 properties 제거
+  del(result["accountId"])
+  del(result["id"])
+  
   #TODO 예외처리 깔끔하게 하기
   if "id" not in result and "status" in result:
     return None

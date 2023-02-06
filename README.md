@@ -13,6 +13,7 @@
   + [ --rmi all ] : 사용했던 모든 이미지를 삭제 (관련된 이미지 전부다 삭제됨)
   + [ --rmi local ] : 커스텀 태그가 없는 이미지만 삭제
   + [ -v, --volumes ] : Compose 정의 파일의 데이터 볼륨을 삭제
+- 마운트된 볼륨 모두 삭제 : docker volume prune
 
 # Commit convention
 - feat : 새로운 기능 추가

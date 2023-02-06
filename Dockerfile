@@ -10,5 +10,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
-ENTRYPOINT ["export", "APP_ENV=DEVELOPMENT"]
 CMD ["python", "app.py"]

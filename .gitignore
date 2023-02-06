@@ -1,6 +1,9 @@
 # monogoDB 
 /data
+/data.*
 .DS_Store
+/dev-data
+/dev-data.*
 # python
 __pycache__/
 __pycache__/*
@@ -9,6 +12,7 @@ __pycache__/*
 # environment
 .env
 config.json
+config.py
 
 
 # simple test file

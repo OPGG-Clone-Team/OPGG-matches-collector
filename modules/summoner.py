@@ -7,8 +7,11 @@ from flask import jsonify
 col = "summoners"
 
 @trycatch
-def update(app, summonerName): #app을 받아야함
-  db = mongoClient(app).LEAGUEDATA
+def update(db, summonerName):
+  # 0. summonerName 확인
+  if not summonerName:
+    raise Exception("소환사 이름을 입력해주세요.")
+  
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
   summoner_brief = db["league_entries"].find_one({"summonerName":summonerName})
   
@@ -35,8 +38,7 @@ def update(app, summonerName): #app을 받아야함
   return summoner
 
 @trycatch
-def findSummoner(app, summonerName):
-  db = mongoClient(app).LEAGUEDATA
+def findSummoner(db, summonerName):
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
   summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})
   

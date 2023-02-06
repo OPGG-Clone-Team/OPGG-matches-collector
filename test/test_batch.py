@@ -18,7 +18,6 @@ class UnitTest(unittest.TestCase):
     ).LEAGUEDATA
     self.db["league_entries"].find({})
     
-  #TODO 트랜잭션 적용 test
   def test_update_all(self):
     league_entries.update_all()
     print("league_entries 데이터 업데이트")

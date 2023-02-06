@@ -1,9 +1,3 @@
-# 상위 경로 패키지 로드
-import sys, os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-
-# 추후 환경변수 로드하는 공통로직 분리하기
-from config.mongo import mongoClient
 from riot_requests import league_v4
 from decorator.trycatch_wrapper import trycatch
 
@@ -11,8 +5,7 @@ from decorator.trycatch_wrapper import trycatch
 col = "league_entries"
 
 @trycatch
-def update_all(app):
-  db = mongoClient(app).LEAGUEDATA
+def update_all(db):
   summoners = []
 
   summoners.extend(league_v4.get_specific_league("challengerleagues"))
@@ -34,13 +27,21 @@ def update_all(app):
     print("가져온 소환사 정보가 없습니다.")
     return
   
-  # TODO : 트랜잭션 작용하기
   # db에 넣기 전 league_entires collection 비우기
   db[col].delete_many({})
   db[col].insert_many(summoners, ordered=True)
 
   print(f"성공적으로 {len(summoners)}명의 엔트리 정보를 업데이트했습니다.")
-    
+  return len(summoners)
+
+def getSummonerBrief(db, summonerName):
+  summoner = db[col].find_one({"summonerName":summonerName})
+  
+  if not summoner:
+    raise Exception("소환사 정보를 찾을 수 없습ㄴ다.")
+  
+  return summoner
+
 if __name__=="__main__":
   update_all()
     

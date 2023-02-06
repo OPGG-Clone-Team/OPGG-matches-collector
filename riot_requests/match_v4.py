@@ -6,6 +6,9 @@ def getSummonerMatches(puuid, start=0, count = 20):
   유저의 최근 전적 id 리스트 가져오기
   2000 requests every 10 seconds
 
+  2023.02.06 추가 : killParticipations가 들어오지 않는 데이터 확인, 에러 처리
+  2023.02.06 추가 : participants의 assists 필드 추가
+
   Args:
       puuid (str)
       start (int, optional): 조회 시작 index, Defaults to 0.
@@ -98,6 +101,18 @@ def getMatchAndTimeline(matchId):
     
     challenges=participant["challenges"]
     
+    # 킬관여율 필드 추가
+    # info["teams"]에서 teamId가 일치하는거 찾고 거기서 totalKill 가져오기
+    # challenges에 killParticipations 필드가 존재하지 않는다면 직접 계산 후 소수 2번째 자리까지 반올림
+    teamId = participant["teamId"]
+    total_team_kills = int(list(filter(lambda x: x["teamId"]==teamId, info_teams))[0]["totalKills"])
+    killParticipation = challenges.get("killParticipation")
+    if not killParticipation:
+      if total_team_kills==0:
+        killParticipation = 0
+      else:
+        killParticipation = round(((participant["kills"]+participant["assists"])/ total_team_kills), 2)
+    
     info_participants.append({
       "matchId" : matchId,
       "teamId":participant["teamId"],
@@ -112,9 +127,11 @@ def getMatchAndTimeline(matchId):
       "championName":participant["championName"],
       "kills":participant["kills"],
       "deaths":participant["deaths"],
+      "assists": participant["assists"],
       "lane":lane,
       "cs":int(participant["totalMinionsKilled"])+int(participant["neutralMinionsKilled"]),
-      "killParticipation":challenges["killParticipation"],
+      # 로직 수정
+      "killParticipation":killParticipation,
       "goldEarned":participant["goldEarned"],
       "kda":str(round(float(challenges["kda"]),2)),
       "pentaKills":participant["pentaKills"],
@@ -166,4 +183,5 @@ def getMatchAndTimeline(matchId):
           target_timeline["skillBuild"].append(event["skillSlot"])
     frameCount+=1
   
-  return { "match" :match, "teams":info_teams, "participants":info_participants, "timelines":timelines.values() }
+  # 2월 6일 수정 : dict_values로 리턴되어 list로 반환하지 않는 이슈 수정
+  return { "match" :match, "teams":info_teams, "participants":info_participants, "timelines":list(timelines.values()) }
