@@ -1,5 +1,6 @@
-import requests
-import os
+import requests, os
+from error import custom_exception
+from flask_api import status
 
 def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   """
@@ -37,11 +38,10 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   
   entries = result["entries"]
   
-  # 만약 list데이터로 넘어오지 않는다면 (ERROR 발생) response 출력 후 함수 종료
-  # fetching한 데이터가 비어 있으면 함수 즉시 종료
   if not entries or not isinstance(entries, list):
-    print(result)
-    return []
+    raise custom_exception.CustomUserError(
+      "리그 엔트리 정보를 가져오는 데 실패했습니다.", 
+      "Result of request to Riot not exists", status.HTTP_404_NOT_FOUND )
 
   entries.sort(key = lambda x : x["leaguePoints"], reverse=True)
   # 티어, 큐, 순위 업데이트

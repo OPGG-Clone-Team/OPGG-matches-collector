@@ -1,5 +1,6 @@
-import requests
-import os
+import requests, os
+from error import custom_exception
+from flask_api import status
 
 def getSummonerMatches(puuid, start=0, count = 20):
   """
@@ -57,24 +58,16 @@ def getMatchAndTimeline(matchId):
   
   # 코드 수정 : result와 result_timeline 둘 중 하나도 존재하지 않으면 return none
   if result.get("status") or result_timeline.get("status"):
-    return None
+    raise custom_exception.CustomUserError(
+      "매치정보를 가져오는 데 실패했습니다.", 
+      "Result of request to Riot not exists", status.HTTP_404_NOT_FOUND )
   
   info = result["info"]
   info_teams = []
   info_participants = []
   
-  
   # timeline에서 얻은 정보
   timelines = {}
-  
-  # timeline = {
-  #   "matchId" : matchId,
-  #   "puuid":puuid,
-    
-  #   "itemBuild":{},
-  #   "skillBuild":[]
-  # }
-  
   match = {
     "matchId" : matchId,
     "gameCreation": info["gameCreation"],
@@ -184,4 +177,8 @@ def getMatchAndTimeline(matchId):
     frameCount+=1
   
   # 2월 6일 수정 : dict_values로 리턴되어 list로 반환하지 않는 이슈 수정
-  return { "match" :match, "teams":info_teams, "participants":info_participants, "timelines":list(timelines.values()) }
+  return { 
+          "match" :match, 
+          "teams":info_teams, 
+          "participants":info_participants, 
+          "timelines":list(timelines.values()) }

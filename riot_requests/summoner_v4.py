@@ -1,5 +1,5 @@
-import requests
-import os
+import requests, os
+from error.custom_exception import *
 
 def getSummoner(summonerId):
   """
@@ -33,8 +33,7 @@ def getSummoner(summonerId):
   del(result["accountId"])
   del(result["id"])
   
-  #TODO 예외처리 깔끔하게 하기
   if "id" not in result and "status" in result:
-    return None
+    raise SummonerNotExists("소환사 정보가 존재하지 않습니다.")
   
   return result

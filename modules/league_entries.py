@@ -1,10 +1,8 @@
 from riot_requests import league_v4
-from decorator.trycatch_wrapper import trycatch
 
 # LEAGUEDATA db의 league_entries collection만 담당
 col = "league_entries"
 
-@trycatch
 def update_all(db):
   summoners = []
 

@@ -1,33 +1,26 @@
-from config.mongo import mongoClient
 from riot_requests import summoner_v4
-from decorator.trycatch_wrapper import trycatch
-from flask import jsonify
+from error.custom_exception import DataNotExists
 
 # LEAGUEDATA db의 summoners만 담당
 col = "summoners"
 
-@trycatch
 def update(db, summonerName):
   # 0. summonerName 확인
-  if not summonerName:
-    raise Exception("소환사 이름을 입력해주세요.")
+  # TODO - 나중에 이부분 다시 custom 예외처리
+  # if not summonerName:
+  #   raise ("소환사 이름을 입력해주세요.")
   
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
   summoner_brief = db["league_entries"].find_one({"summonerName":summonerName})
   
   # 1-1. 없다면 raise Exception
   if not summoner_brief:
-    raise Exception("league_entries collection에 소환사 정보가 없습니다.")
+    raise DataNotExists("league_entries collection에 소환사 정보가 없습니다.")
   
   # 2. summonerId를 가져와서 summoner_v4의 summoner 정보를 가져오기
   summoner = summoner_v4.getSummoner(summoner_brief["summonerId"])
   
-  # 2-1. 없다면 raise Exception
-  if not summoner:
-    raise Exception("소환사 정보를 가져오는 데 실패했습니다.")
-  
-  # 3. db에 저장
-  # upsert=True
+  # 3. db에 저장 (upsert=True)
   db[col].update_one(
       {"puuid":summoner["puuid"]},
       {"$set":summoner},
@@ -37,7 +30,6 @@ def update(db, summonerName):
   
   return summoner
 
-@trycatch
 def findSummoner(db, summonerName):
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
   summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})

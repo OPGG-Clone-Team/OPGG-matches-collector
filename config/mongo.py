@@ -1,7 +1,5 @@
 from pymongo import MongoClient,  IndexModel, ASCENDING, DESCENDING
-from decorator.trycatch_wrapper import trycatch
 
-@trycatch
 def mongoClient(app):
   mongoClient = MongoClient(app.config["MONGO_URI"])
   create_initial_indexes(mongoClient.LEAGUEDATA)

@@ -1,13 +1,11 @@
 
 from riot_requests import match_v4
-from decorator.trycatch_wrapper import trycatch
 
 # pymongo insert operation 동작 시 원본 객체에 영향을 미치는 문제 발견
 # https://pymongo.readthedocs.io/en/stable/faq.html#writes-and-ids
 # _id까지 보내주는 dump_utils 사용하거나 다시 db에서 조회하는 방법으로 가야 할듯
 # 우선은 직접 제거
 
-@trycatch
 def update(db, matchId):
   """
   특정 matchId로 match, teams, participants 업데이트 후 결과 반환

@@ -1,11 +1,10 @@
 from riot_requests import match_v4
-from decorator.trycatch_wrapper import trycatch
+from error.custom_exception import *
 
 # LEAGUEDATA db의 summoner_matches만 담당
 
 col = "summoner_matches"
 
-@trycatch
 def update(db, summonerName):
   """
   소환사의 최근 match Id 리스트를 DB에 업데이트
@@ -22,9 +21,8 @@ def update(db, summonerName):
   """
   summoner = db["summoners"].find_one({"name": summonerName})
   
-  # TODO 공통 에러처리
   if not summoner:
-    raise Exception("유저를 찾을 수 없음")
+    raise DataNotExists("데이터베이스에서 소환사 정보를 찾을 수 없습니다.")
 
   puuid = summoner["puuid"]
   
@@ -67,7 +65,6 @@ def update(db, summonerName):
 
   return summoner["puuid"]
 
-@trycatch
 def findRecentMatchIds(db, puuid, startIdx=0, size=30):
   """
   소환사의 최근 Match Id 리스트를 반환
