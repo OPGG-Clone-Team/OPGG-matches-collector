@@ -1,0 +1,41 @@
+# 추후 Spring쪽으로 옮기기
+
+version: "3.8"
+services:
+  # 배치서버
+  batch-server:
+    build:
+      # context : 도커파일 위치
+      # dockerfile : 도커파일 경로
+      context: .
+      dockerfile: Dockerfile-batch
+    container_name: matches-collector
+    ports:
+      - 5000:5000
+    depends_on:
+      - mongodb
+    links:
+      - mongodb
+    env_file:
+      - ./env/prod.env
+      - ./env/common.env
+    
+  # 몽고DB
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - 27018:27017
+    volumes:  
+      - ./dev-data:/data/db # 로컬 디렉토리 하위의 ./dev-data와 컨테이너 안의 /data/db를 매핑
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=1234 
+      - MONGO_INITDB_DATABASE=LEAGUEDATA
+#     networks:
+#       - privateNetwork
+
+# networks:
+#   privateNetwork:
+#     driver: bridge

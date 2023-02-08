@@ -9,6 +9,7 @@
 - docker compose 실행 : docker-compose up [option]
   + [ -d ] : 백그라운드 실행
   + [ --build ] : 빌드 후 실행
+  + [ -f ] : 컴파일 옵션, -f 뒤에 docker-compose 파일명을 적기
 - docker compose로 실행시킨 컨테이너 down : docker-compose down [option]
   + [ --rmi all ] : 사용했던 모든 이미지를 삭제 (관련된 이미지 전부다 삭제됨)
   + [ --rmi local ] : 커스텀 태그가 없는 이미지만 삭제

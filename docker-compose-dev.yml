@@ -5,17 +5,20 @@ services:
   # 배치서버
   batch-server:
     build:
+      # context : 도커파일 위치
+      # dockerfile : 도커파일 경로
       context: .
+      dockerfile: Dockerfile-batch
     container_name: matches-collector
     ports:
-      - 5000:5000
+      - 5001:5001
     depends_on:
       - mongodb
     links:
       - mongodb
-    environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app
+    env_file:
+      - ./env/dev.env
+      - ./env/common.env
     
   # 몽고DB
   mongodb:

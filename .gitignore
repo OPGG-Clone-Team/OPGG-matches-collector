@@ -10,9 +10,8 @@ __pycache__/*
 !.__pycache__/*
 
 # environment
-.env
-config.json
-config.py
+*.env
+/env
 
 
 # simple test file
