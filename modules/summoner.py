@@ -1,5 +1,6 @@
 from riot_requests import summoner_v4
 from error.custom_exception import DataNotExists
+import datetime
 
 # LEAGUEDATA db의 summoners만 담당
 col = "summoners"
@@ -19,6 +20,7 @@ def update(db, summonerName):
   
   # 2. summonerId를 가져와서 summoner_v4의 summoner 정보를 가져오기
   summoner = summoner_v4.getSummoner(summoner_brief["summonerId"])
+  summoner["updatedAt"] = datetime.datetime.utcnow()
   
   # 3. db에 저장 (upsert=True)
   db[col].update_one(

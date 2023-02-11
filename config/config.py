@@ -16,6 +16,7 @@ class DevelopmentConfig(Config):
     MONGO_URI=f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_ADMIN_DB}"
     FLASK_PORT=os.environ.get("DEV_FLASK_PORT")
     FLASK_HOST=os.environ.get("DEV_FLASK_HOST")
+    FLASK_DEBUG = os.environ.get("DEV_FLASK_DEBUG")
 
 class ProductionConfig(Config):
   # FLASK_ENV = production
@@ -28,6 +29,7 @@ class ProductionConfig(Config):
     MONGO_URI=f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_ADMIN_DB}"
     FLASK_PORT=os.environ.get("FLASK_PORT")
     FLASK_HOST=os.environ.get("FLASK_HOST")
+    FLASK_DEBUG = os.environ.get("FLASK_DEBUG")
 
 class TestConfig(Config):
     # 테스트 환경, FLASK_ENV = test
@@ -41,6 +43,7 @@ class TestConfig(Config):
     MONGO_URI=f"mongodb://{MONGO_HOST}:{MONGO_PORT}"
     FLASK_PORT=os.environ.get("FLASK_PORT")
     FLASK_HOST=os.environ.get("FLASK_HOST")
+    FLASK_DEBUG = os.environ.get("FLASK_DEBUG")
 
 
 config = {

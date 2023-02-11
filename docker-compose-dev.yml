@@ -19,7 +19,8 @@ services:
     env_file:
       - ./env/dev.env
       - ./env/common.env
-    
+    environment:
+      - TZ=Asia/Seoul
   # 몽고DB
   mongodb:
     image: mongo

@@ -6,7 +6,7 @@ from riot_requests import match_v4
 # _id까지 보내주는 dump_utils 사용하거나 다시 db에서 조회하는 방법으로 가야 할듯
 # 우선은 직접 제거
 
-def update(db, matchId):
+def findOrUpdate(db, matchId):
   """
   특정 matchId로 match, teams, participants 업데이트 후 결과 반환
 
@@ -65,6 +65,13 @@ def update(db, matchId):
   
   return match_info
   
-if __name__=="__main__":
-  update("KR_6336134778")
+def findOrUpdateAll(db, matchId_list):
+  result = []
+  for matchId in matchId_list:
+    result.append(findOrUpdate(db, matchId))
+    
+  return result
+    
+# if __name__=="__main__":
+#   findOrUpdate("KR_6336134778")
     
