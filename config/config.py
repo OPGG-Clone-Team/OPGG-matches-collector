@@ -29,7 +29,6 @@ class ProductionConfig(Config):
     MONGO_URI=f"mongodb://{MONGO_USERNAME}:{MONGO_PASSWORD}@{MONGO_HOST}:{MONGO_PORT}/{MONGO_ADMIN_DB}"
     FLASK_PORT=os.environ.get("FLASK_PORT")
     FLASK_HOST=os.environ.get("FLASK_HOST")
-    FLASK_DEBUG = os.environ.get("FLASK_DEBUG")
 
 class TestConfig(Config):
     # 테스트 환경, FLASK_ENV = test
