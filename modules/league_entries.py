@@ -1,9 +1,9 @@
 from riot_requests import league_v4
-
+from error.custom_exception import DataNotExists
 # LEAGUEDATA db의 league_entries collection만 담당
 col = "league_entries"
 
-def update_all(db):
+def updateAll(db):
   summoners = []
 
   summoners.extend(league_v4.get_specific_league("challengerleagues"))
@@ -36,10 +36,23 @@ def getSummonerBrief(db, summonerName):
   summoner = db[col].find_one({"summonerName":summonerName})
   
   if not summoner:
-    raise Exception("소환사 정보를 찾을 수 없습ㄴ다.")
+    raise DataNotExists("데이터베이스에서 소환사 정보를 찾을 수 없습니다.")
   
   return summoner
 
+def find(db, page=1):
+  limit = 100
+  offset = (page - 1) * limit
+  
+  results = list(db[col].find(
+      {}, {'_id': 0})
+      .limit(limit).skip(offset))
+  
+  if len(results)==0:
+    raise DataNotExists("데이터베이스에서 리그 엔트리 정보를 찾을 수 없습니다.")
+  
+  return results
+
 if __name__=="__main__":
-  update_all()
+  updateAll()
     

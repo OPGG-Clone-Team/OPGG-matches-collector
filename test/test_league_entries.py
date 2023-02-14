@@ -10,4 +10,4 @@ class UnitTest(unittest.TestCase):
     self.app = create_app()
     
   def update_test(self):
-    league_entries.update_all()
+    league_entries.updateAll()

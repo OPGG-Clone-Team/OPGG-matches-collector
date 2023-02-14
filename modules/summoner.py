@@ -5,22 +5,26 @@ import datetime
 # LEAGUEDATA db의 summoners만 담당
 col = "summoners"
 
-def update(db, summonerName):
+def update(db, summonerName, ignore=False, summoner_brief=None):
   # 0. summonerName 확인
   # TODO - 나중에 이부분 다시 custom 예외처리
   # if not summonerName:
   #   raise ("소환사 이름을 입력해주세요.")
   
-  # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
-  summoner_brief = db["league_entries"].find_one({"summonerName":summonerName})
-  
-  # 1-1. 없다면 raise Exception
-  if not summoner_brief:
-    raise DataNotExists("league_entries collection에 소환사 정보가 없습니다.")
-  
+  if not ignore:
+    # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
+    summoner_brief = db["league_entries"].find_one({"summonerName":summonerName})
+    
+    # 1-1. 없다면 raise Exception
+    if not summoner_brief:
+      raise DataNotExists("league_entries collection에 소환사 정보가 없습니다.")
+    
   # 2. summonerId를 가져와서 summoner_v4의 summoner 정보를 가져오기
   summoner = summoner_v4.getSummoner(summoner_brief["summonerId"])
   summoner["updatedAt"] = datetime.datetime.utcnow()
+  summoner["queue"] = summoner_brief["queue"]
+  summoner["tier"] = summoner_brief["tier"]
+  summoner["rank"] = summoner_brief["rank"]
   
   # 3. db에 저장 (upsert=True)
   db[col].update_one(
@@ -32,7 +36,20 @@ def update(db, summonerName):
   
   return summoner
 
-def findSummoner(db, summonerName):
+def updateAll(db):
+  # 1. league_entries에 있는 소환사 정보들 중 summonerId만 가져오기"
+  league_entries = list(db["league_entries"].find({}))
+  
+  if len(league_entries)==0:
+    raise DataNotExists("league_entries collection에 소환사 정보가 없습니다.")
+  
+  for entry in league_entries:
+    update(db, entry["summonerName"], ignore=True, summoner_brief=entry)
+  
+  print(f"성공적으로 {len(league_entries)}명의 소환사 정보를 업데이트했습니다.")
+  return len(league_entries)
+
+def find(db, summonerName):
   # 1. league_entries에서 summonerName 과 일치하는 데이터 조회
   summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})
   

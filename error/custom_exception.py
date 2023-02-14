@@ -16,11 +16,19 @@ from flask_request_validator import AbstractRule
 from flask_request_validator.exceptions import RuleError, RequiredJsonKeyError, RequestError
 from flask_api import status
 
+
+
 class CustomUserError(Exception):
     def __init__(self, error_message, error_type, status_code):
         self.status_code = status_code
         self.error_type = error_type
         self.error_message = error_message
+        
+class RateLimiteExceededError(CustomUserError):
+    def __init__(self, error_message):
+        self.status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        self.error_message = error_message
+        self.error_type = "Rate Limit Exceeded"
 
 class DataNotExists(CustomUserError):
     def __init__(self, error_message):
@@ -46,6 +54,13 @@ class ValidateSizeParam(AbstractRule):
         if not 0 <= value <= 200:
             #TODO - size 범위 어떻게 할건지 - 공식문서 참조
             raise RuleError('size는 0부터 200 사이의 값으로 지정해야 합니다.')
+        return value
+
+class ValidatePageParam(AbstractRule):
+    def validate(self, value):
+        if not 0 <= value <= 50:
+            #TODO - page 범위 어떻게 할건지 - 공식문서 참조
+            raise RuleError('page는 0부터 50 사이의 값으로 지정해야 합니다.')
         return value
 
 # class IsStr(AbstractRule):

@@ -1,6 +1,7 @@
-import requests, os
+import os
 from error import custom_exception
 from flask_api import status
+from common import delayeableRequest
 
 def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   """
@@ -30,12 +31,12 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
     return []
   
   url = f"https://kr.api.riotgames.com/lol/league/v4/{league}/by-queue/{queue}"
-
+  headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
   # 추후 logging 적용
   print(f'다음으로 request : {url}')
 
-  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}).json() ## list type expected
-  
+  ## delayable
+  result = delayeableRequest(url, headers, 10)
   entries = result["entries"]
   
   if not entries or not isinstance(entries, list):
@@ -50,37 +51,4 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
     entry["tier"] = entry["rank"]
   
   return entries
-
-# def getSummoner(id):
-#   """
-#   summonerId로 Summoner 정보 가져오기\n
-#   1600 requests every 1 minutes\n
-#   경고 - Consistently looking up summoner ids that don't exist will result in a blacklist.\n
-  
-#   Args:
-#       id (str): summonerId
-
-#   Returns:
-#       Summoner: {
-#         "id": 소환사 ID,
-#         "accountId": 소환사 계정 ID,
-#         "puuid": 소환사 PUUID,
-#         "name": 소환사명,
-#         "profileIconId": 프로필 아이콘 id,
-#         "revisionDate": 소환사 정보 최종 수정일,
-#         "summonerLevel": 소환사 레벨,
-#         "queryAllowTime": 해당 소환사를 query 가능한 시간, default : null
-#       }
-#   """
-  
-#   url = f"https://kr.api.riotgames.com/lol/summoner/v4/summoners/{id}"
-
-#   # 추후 logging 적용
-#   print(f'다음으로 request : {url}')
-#   result = requests.get(url, headers={"X-Riot-Token":API_KEY}).json()
-  
-#   if "id" not in result:
-#     return {}
-  
-#   return result
 

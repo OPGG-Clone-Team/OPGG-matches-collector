@@ -19,7 +19,7 @@ class UnitTest(unittest.TestCase):
     self.db["league_entries"].find({})
     
   def test_update_all(self):
-    league_entries.update_all()
+    league_entries.updateAll()
     print("league_entries 데이터 업데이트")
     
     league_entry_summoner = self.db["league_entries"].find({})

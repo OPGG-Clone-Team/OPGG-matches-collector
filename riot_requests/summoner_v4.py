@@ -1,5 +1,6 @@
-import requests, os
+import os
 from error.custom_exception import *
+from common import delayeableRequest
 
 def getSummoner(summonerId):
   """
@@ -23,17 +24,19 @@ def getSummoner(summonerId):
   """
   
   url = f"https://kr.api.riotgames.com/lol/summoner/v4/summoners/{summonerId}"
-
+  headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
   # 추후 logging 적용
   print(f'다음으로 request : {url}')
-  print(os.getenv("RIOT_API_KEY_1"))
-  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}, timeout = 10).json()
+  
+  result = delayeableRequest(url, headers, 10)
+  
+  if "id" not in result and "status" in result:
+    raise SummonerNotExists("소환사 정보가 존재하지 않습니다.")
   
   # 필요 없는 properties 제거
   del(result["accountId"])
   del(result["id"])
   
-  if "id" not in result and "status" in result:
-    raise SummonerNotExists("소환사 정보가 존재하지 않습니다.")
-  
   return result
+
+

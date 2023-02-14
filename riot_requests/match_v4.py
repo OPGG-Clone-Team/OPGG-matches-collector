@@ -1,6 +1,7 @@
-import requests, os
+import os
 from error import custom_exception
 from flask_api import status
+from common import delayeableRequest
 
 def getSummonerMatches(puuid, start=0, count = 20):
   """
@@ -23,10 +24,11 @@ def getSummonerMatches(puuid, start=0, count = 20):
   type = "ranked"
   
   url = f"https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}"
+  headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
   
   print(f'다음으로 request : {url}')
   
-  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}).json()
+  result = delayeableRequest(url, headers, 10)
   
   return result
 
@@ -48,13 +50,14 @@ def getMatchAndTimeline(matchId):
     return None
   
   url = f"https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}"
+  headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
   
   print(f'다음으로 request : {url}')
   
   # 여기서부터는 필수 정보 제외하고 죄다 갖다 버리기
   
-  result = requests.get(url, headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}).json()
-  result_timeline = requests.get(url+'/timeline', headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}).json()
+  result = delayeableRequest(url, headers, 10)
+  result_timeline = delayeableRequest(url+'/timeline', headers, 10)
   
   # 코드 수정 : result와 result_timeline 둘 중 하나도 존재하지 않으면 return none
   if result.get("status") or result_timeline.get("status"):
