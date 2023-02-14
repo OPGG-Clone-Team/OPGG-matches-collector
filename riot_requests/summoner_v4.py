@@ -1,6 +1,6 @@
 import os
 from error.custom_exception import *
-from common import delayeableRequest
+from riot_requests.common import delayeableRequest
 
 def getSummoner(summonerId):
   """

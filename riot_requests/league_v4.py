@@ -1,7 +1,7 @@
 import os
 from error import custom_exception
 from flask_api import status
-from common import delayeableRequest
+from riot_requests.common import delayeableRequest
 
 def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   """
