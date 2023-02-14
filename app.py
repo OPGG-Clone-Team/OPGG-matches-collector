@@ -40,7 +40,7 @@ def updateSummoner(valid: ValidRequest):
   """
   업데이트된 소환사 정보 보내주기
   
-  Query Params:
+  Body(json):
       summonerName(str)
   
   Returns:
@@ -83,7 +83,7 @@ def updateSummonerMatches(valid: ValidRequest):
   """
   업데이트된 최근 소환사의 전적 가져오기
 
-  Query Parameter:
+  Body(json):
       summonerName(String, required)
       startIdx(Integer, Default to 0) : 검색 시작 인덱스
       size(Integer, Default to 30) : 검색할 인덱스 수
@@ -127,6 +127,12 @@ def updateSummonerMatches(valid: ValidRequest):
 
 @app.route('/batch', methods=["POST"])
 def runBatch(): # 배치 수행
+  """수동 배치돌리기
+  league_entries 업데이트해주기
+  
+  Returns:
+      updated(int) : 마스터 이상 유저 업데이트수
+  """
   # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
   
   # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
@@ -143,7 +149,17 @@ def runBatch(): # 배치 수행
     Param('size', GET, int, default=30, required=False, rules=[ValidateStartIdxParam()]),
 )
 def getSummonerAndMatches(valid: ValidRequest):
-  # 소환사 이름 받아서 우선 업데이트 갱신일 검색
+  """소환사 이름 받아서 "갱신되지 않은" 소환사 정보 + 소환사 전적정보를 리턴
+  
+  Query Parameter:
+      summonerName(String, required)
+      startIdx(Integer, Default to 0) : 검색 시작 인덱스
+      size(Integer, Default to 30) : 검색할 인덱스 수
+
+  Returns:
+      _type_: _description_
+  """
+  # 
   parameters = valid.get_params()
   summonerName = parameters["summonerName"]
   startIdx = parameters["startIdx"]
