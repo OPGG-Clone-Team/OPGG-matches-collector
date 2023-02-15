@@ -1,1 +1,6 @@
-__pycache__/
+*/__pycache__
+data
+dev-data
+test.py
+.vscode
+__pycache__
