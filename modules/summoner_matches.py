@@ -78,16 +78,17 @@ def findRecentMatchIds(db, puuid, startIdx=0, size=30):
   Returns:
       matchIds(list): 소환사의 최근 Match Id 리스트
   """
-  matchIds = db[col].find_one({"puuid":puuid})["summoner_match_ids"]
+  summonerMatches = db[col].find_one({"puuid":puuid})
   
-  if len(matchIds)==0:
+  if not summonerMatches:
     return []
   
   else:
-    if len(matchIds)<size+startIdx:
-      return matchIds[startIdx:]
+    summonerMatches = summonerMatches["summoner_match_ids"]
+    if len(summonerMatches)<size+startIdx:
+      return summonerMatches[startIdx:]
     else:
-      return matchIds[startIdx:size+startIdx]
+      return summonerMatches[startIdx:size+startIdx]
   
   
 if __name__=="__main__":
