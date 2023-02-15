@@ -216,8 +216,8 @@ def summonerBatch(): # 배치 수행
 
 @app.route('/test', methods = ["GET"])
 def test():
-  print(request.args.get("summonerName"))
-  return {"ok"}
+  summonerName =request.args.get("summonerName")
+  return {"test":summonerName}
 
 # 스케줄링 걸기
 start_schedule([
