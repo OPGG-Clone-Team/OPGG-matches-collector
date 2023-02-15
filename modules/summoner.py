@@ -54,7 +54,7 @@ def find(db, summonerName):
   summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})
   
   if not summoner:
-    return None
+    raise DataNotExists("summoners에 해당 이름을 가진 소환사 정보가 없습니다.")
   
   return summoner
 
