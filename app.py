@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import os
 from config.mongo import mongoClient
 from modules import summoner, league_entries, match, summoner_matches
@@ -213,6 +213,11 @@ def summonerBatch(): # 배치 수행
   #   with session.start_transaction():
   updated_summoner_count=summoner.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
+
+@app.route('/test', methods = ["GET"])
+def test():
+  print(request.args.get("summonerName"))
+  return {"ok"}
 
 # 스케줄링 걸기
 start_schedule([
