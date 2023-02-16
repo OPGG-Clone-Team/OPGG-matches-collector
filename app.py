@@ -214,10 +214,22 @@ def summonerBatch(): # 배치 수행
   updated_summoner_count=summoner.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
 
-@app.route('/test', methods = ["GET"])
-def test():
-  summonerName =request.args.get("summonerName")
-  return {"test":summonerName}
+@app.route('/batch/match', methods=["POST"])
+def matchBatch(): # 배치 수행
+  """수동 배치돌리기
+  소환사 정보 내에 있는 모든 소환사들의 summoner_match와 match정보를 업데이트
+  실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
+  
+  Returns:
+      updated(int) : 마스터 이상 유저 업데이트수
+  """
+  # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
+  
+  # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
+  # with mongoClient(app).start_session() as session:
+  #   with session.start_transaction():
+  updated_summoner_count=summoner.updateAll(db)
+  return {"status":"ok","updated":updated_summoner_count}
 
 # 스케줄링 걸기
 start_schedule([
@@ -231,6 +243,12 @@ start_schedule([
     "time":60*12
   },
   ])
+
+# 테스트 라우터
+@app.route('/test', methods = ["GET"])
+def test():
+  summonerName =request.args.get("summonerName")
+  return {"test":summonerName}
 
 
 def create_app():
