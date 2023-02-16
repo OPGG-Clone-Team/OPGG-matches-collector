@@ -13,6 +13,11 @@ from config.config import config
 import logging
 import logging.handlers
 from utils.logging_handler import create_handler
+
+log_dir = './logs'
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
+
 app=Flask(__name__)
 
 # 기본 앱 환경 가져오기
