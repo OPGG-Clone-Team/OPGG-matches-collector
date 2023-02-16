@@ -8,16 +8,22 @@ from error.custom_exception import *
 from scheduler import start_schedule
 from utils.date_calc import timeDifToMinute
 from flask_api import status
-# import logging
-
 # 최초 환경변수 파일 로드
 from config.config import config
-
+import logging
+import logging.handlers
+from utils.logging_handler import create_handler
 app=Flask(__name__)
 
-# 1. 기본 앱 환경 가져오기
+# 기본 앱 환경 가져오기
 config_type = os.getenv("FLASK_ENV") if os.getenv("FLASK_ENV") else "default"
 app.config.from_object(config[config_type])
+
+# 로깅 초기설정
+common_handler = create_handler(app.config)
+
+logging.getLogger('werkzueg').addHandler(common_handler)
+app.logger.addHandler(common_handler)
 
 # app 공통 에러 핸들러 추가
 error_handle(app)
@@ -177,6 +183,11 @@ def getLeagueEntries(valid:ValidRequest):
   
   result = league_entries.find(db, page)
   
+  #TEST
+  logging.info("test info message")
+  app.logger.info("flask test info message")
+  app.logger.error("flask test error message")
+  
   return jsonify(result)
 
 
@@ -239,8 +250,8 @@ start_schedule([
   },
   {
     "method":summonerBatch,
-    # TODO - 우선 소환사 정보갱신은 12시간 단위로 실행하도록 설정
-    "time":60*12
+    # TODO - 우선 소환사 정보갱신은 새벽 4시에 주기적으로 실행하도록 설정
+    "time":4
   },
   ])
 

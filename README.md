@@ -15,7 +15,8 @@
   + [ --rmi local ] : 커스텀 태그가 없는 이미지만 삭제
   + [ -v, --volumes ] : Compose 정의 파일의 데이터 볼륨을 삭제
 - 마운트된 볼륨 모두 삭제 : docker volume prune
-
+- 컨테이너 메인 프로세스 접근 : docker attach [container]
+  + ctrl + p + q로 탈출
 # Commit convention
 - feat : 새로운 기능 추가
 - fix : 버그 수정

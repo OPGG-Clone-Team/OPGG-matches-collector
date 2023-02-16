@@ -4,7 +4,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 class Config:
   # DEFAULT CONFIG
   API_KEY=os.environ.get("RIOT_API_KEY_1")
-
+  LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL")
+  LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
 class DevelopmentConfig(Config):
     # FLASK_ENV = development
     DEBUG=True

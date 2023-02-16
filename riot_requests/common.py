@@ -1,7 +1,12 @@
 import requests, time
 from flask_api import status
+import logging
+# from utils.logging_handler import create_handler
+
+logger = logging.getLogger("app")
 
 def delayeableRequest(url, headers, timeout):
+  logger.info(f'다음으로 request : {url}')  
   request = requests.get(url, headers=headers, timeout=timeout)
   
   # API Rate Limit을 초과하지 않을 때까지 계속 반복

@@ -24,3 +24,7 @@ test.py
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# log file
+logs/
+logs/*

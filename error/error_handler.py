@@ -5,7 +5,7 @@ from flask_request_validator.exceptions import InvalidRequestError, InvalidHeade
 from error.custom_exception import CustomUserError
 from error.response import error_response
 from flask_api import status
-
+import logging
 
 def error_handle(app):
     """에러 핸들러
@@ -21,27 +21,29 @@ def error_handle(app):
     
     @app.errorhandler(Exception)
     def handle_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "서버 내부 오류가 발생했습니다.", "Unknown Internal Server Error", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @app.errorhandler(AttributeError)
     def handle_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "서버 내부 오류가 발생했습니다.", "NoneType Error", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @app.errorhandler(KeyError)
     def handle_key_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "서버 내부 오류가 발생했습니다.", "Key Error", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @app.errorhandler(TypeError)
     def handle_type_error(e):
-        traceback.print_exc()
+        
+        message = "서버 내부 오류가 발생했습니다."
+        app.logger.error(e)
         return error_response(e, "서버 내부 오류가 발생했습니다.", "Type Error", status.HTTP_500_INTERNAL_SERVER_ERROR)
  
     @app.errorhandler(ValueError)
     def handle_value_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "서버 내부 오류가 발생했습니다.", "Value Error", status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @app.errorhandler(InvalidRequestError)
@@ -49,15 +51,20 @@ def error_handle(app):
         """validate_params 정규식 에러 (flask_request_validator)
         validate_params rules에 위배될 경우 발생되는 에러 메시지를 처리하는 함수
         """
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "API 명세에 따른 올바른 값을 입력해주세요", "Invalid Request Error",status.HTTP_400_BAD_REQUEST)
 
     @app.errorhandler(RuleError)
     def handle_rule_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, "API 명세에 따른 올바른 값을 입력해주세요", "Invalid Rule Error",status.HTTP_400_BAD_REQUEST)
+    
+    @app.errorhandler(status.HTTP_404_NOT_FOUND)
+    def handle_rule_error(e):
+        app.logger.error(e)
+        return error_response(e, "올바른 경로로 접근하세요.", "Page not found.",status.HTTP_404_NOT_FOUND)
     
     @app.errorhandler(CustomUserError)
     def handle_error(e):
-        traceback.print_exc()
+        app.logger.error(e)
         return error_response(e, e.error_message, e.error_type, e.status_code)

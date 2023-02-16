@@ -32,8 +32,6 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   
   url = f"https://kr.api.riotgames.com/lol/league/v4/{league}/by-queue/{queue}"
   headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
-  # 추후 logging 적용
-  print(f'다음으로 request : {url}')
 
   ## delayable
   result = delayeableRequest(url, headers, 10)

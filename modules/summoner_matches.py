@@ -1,8 +1,7 @@
 from riot_requests import match_v4
 from error.custom_exception import *
 
-# LEAGUEDATA db의 summoner_matches만 담당
-
+# LEAGUEDATA db의 summoner_matches 담당
 col = "summoner_matches"
 
 def update(db, summonerName):

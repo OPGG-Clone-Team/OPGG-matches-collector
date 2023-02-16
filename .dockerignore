@@ -4,3 +4,4 @@ dev-data
 test.py
 .vscode
 __pycache__
+logs
