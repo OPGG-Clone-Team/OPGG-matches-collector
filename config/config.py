@@ -21,7 +21,8 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
   # FLASK_ENV = production
-    DEBUG = False
+  # TODO - 구체적인 시스템 설계단계 끝나기 전까지는 debug 모드로 작동
+    DEBUG = True
     MONGO_HOST =os.environ.get("MONGO_HOST")
     MONGO_PORT= os.environ.get("MONGO_PORT")
     MONGO_USERNAME= os.environ.get("MONGO_USERNAME")
