@@ -25,8 +25,6 @@ def getSummoner(summonerId):
   
   url = f"https://kr.api.riotgames.com/lol/summoner/v4/summoners/{summonerId}"
   headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
-  # 추후 logging 적용
-  print(f'다음으로 request : {url}')
   
   result = delayeableRequest(url, headers, 10)
   
@@ -35,8 +33,9 @@ def getSummoner(summonerId):
   
   # 필요 없는 properties 제거
   del(result["accountId"])
-  del(result["id"])
   
   return result
+
+
 
 

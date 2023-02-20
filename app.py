@@ -1,22 +1,22 @@
 from flask import Flask, jsonify, request
 import os
 from config.mongo import mongoClient
-from modules import summoner, league_entries, match, summoner_matches
+log_dir = './logs'
+if not os.path.exists(log_dir):
+    os.mkdir(log_dir)
+from utils import initialize_logger
 from flask_request_validator import *
 from error.error_handler import error_handle
 from error.custom_exception import *
-from scheduler import start_schedule
 from utils.date_calc import timeDifToMinute
 from flask_api import status
 # 최초 환경변수 파일 로드
 from config.config import config
-import logging
-import logging.handlers
-from utils.logging_handler import create_handler
 
-log_dir = './logs'
-if not os.path.exists(log_dir):
-    os.mkdir(log_dir)
+from scheduler import start_schedule
+import logging
+from modules import summoner, league_entries, match, summoner_matches
+
 
 app=Flask(__name__)
 
@@ -24,16 +24,13 @@ app=Flask(__name__)
 config_type = os.getenv("FLASK_ENV") if os.getenv("FLASK_ENV") else "default"
 app.config.from_object(config[config_type])
 
-# 로깅 초기설정
-common_handler = create_handler(app.config)
-
-logging.getLogger('werkzueg').addHandler(common_handler)
-app.logger.addHandler(common_handler)
+# 로거 설정
+logger = logging.getLogger("app")
 
 # app 공통 에러 핸들러 추가
 error_handle(app)
 
-# MONGO DB
+# MONGO DB  
 db = mongoClient(app).LEAGUEDATA
 
 # Param의 request_parameter_type
@@ -68,14 +65,14 @@ def updateSummoner(valid: ValidRequest):
   # 만약 갱신시각이 현재시간과 비교해서 2분 이하로 차이난다면 단순 db 조회 후 리턴
   summonerInfo = summoner.find(db, summonerName)
   if not summonerInfo:
-    summonerInfo = summoner.update(db, summonerName)
+    summonerInfo = summoner.updateBySummonerName(db, summonerName)
   else:
     timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).seconds
     if timeDiff < 60*2:
       # TODO - 나중에 다른 에러로 고치기
       raise CustomUserError(f"{timeDiff}초 전에 이미 소환사 정보를 갱신했습니다.", "Trying update too frequently", status.HTTP_400_BAD_REQUEST)
   
-  result = summoner.update(db, summonerName)
+  result = summoner.updateBySummonerName(db, summonerName)
   
   # 필요없는 정보 제거
   del(result["updatedAt"])
@@ -119,7 +116,7 @@ def updateSummonerMatches(valid: ValidRequest):
   
   summonerInfo = summoner.find(db, summonerName)
   if not summonerInfo:
-    summonerInfo = summoner.update(db, summonerName)
+    summonerInfo = summoner.updateBySummonerName(db, summonerName)
   else:
     # 만약 갱신시각이 현재시간과 비교해서 2분 이하로 차이난다면 단순 db 조회 후 리턴
     timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).seconds
@@ -182,24 +179,19 @@ def getSummonerAndMatches(valid: ValidRequest):
 @validate_params(
     Param('page', GET, int, default=1, required=False, rules=[ValidateStartIdxParam()]),
 )
-def getLeagueEntries(valid:ValidRequest):
+def getRank(valid:ValidRequest):
   parameters = valid.get_params()
   page = parameters["page"]
   
   result = league_entries.find(db, page)
   
-  #TEST
-  logging.info("test info message")
-  app.logger.info("flask test info message")
-  app.logger.error("flask test error message")
-  
   return jsonify(result)
 
 
 @app.route('/batch', methods=["POST"])
-def leagueEntriesBatch(): # 배치 수행
+def leagueEntriesBatch():
   """수동 배치돌리기
-  league_entries 업데이트해주기
+  league_entries 가져와서 rank정보 업데이트해주기
   2023/02/14 수정 : 사용자가 접근할 수 있는 배치로 따로 빼기
   
   Returns:
@@ -207,9 +199,7 @@ def leagueEntriesBatch(): # 배치 수행
   """
   # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
   
-  # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
-  # with mongoClient(app).start_session() as session:
-  #   with session.start_transaction():
+  logger.info("랭킹정보 갱신 시작")
   updated_summoner_count=league_entries.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
 
@@ -224,9 +214,7 @@ def summonerBatch(): # 배치 수행
   """
   # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
   
-  # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
-  # with mongoClient(app).start_session() as session:
-  #   with session.start_transaction():
+  logger.info("소환사 정보 전체 갱신 시작")
   updated_summoner_count=summoner.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
 
@@ -247,14 +235,18 @@ def matchBatch(): # 배치 수행
   updated_summoner_count=summoner.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
 
+
 # 스케줄링 걸기
+# TODO - leagueEntriesBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
   {
-    "method":leagueEntriesBatch, 
-    "time":2
+    "job":leagueEntriesBatch,
+    "method":"interval", 
+    "time":1
   },
   {
-    "method":summonerBatch,
+    "job":summonerBatch,
+    "method":"cron",
     # TODO - 우선 소환사 정보갱신은 새벽 4시에 주기적으로 실행하도록 설정
     "time":4
   },
@@ -266,12 +258,9 @@ def test():
   summonerName =request.args.get("summonerName")
   return {"test":summonerName}
 
-
-def create_app():
-  return app
-
 if __name__ == "__main__":
   app.run(
     host = app.config["FLASK_HOST"], 
-    port=app.config["FLASK_PORT"])
+    port=app.config["FLASK_PORT"],
+    debug=False)
   

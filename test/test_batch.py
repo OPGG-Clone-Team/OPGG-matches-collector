@@ -24,7 +24,7 @@ class UnitTest(unittest.TestCase):
     
     league_entry_summoner = self.db["league_entries"].find({})
     for aSummoner in league_entry_summoner:
-      summoner.update(aSummoner["summonerName"])
+      summoner.updateBySummonerName(aSummoner["summonerName"])
       summoners = self.db["summoners"].find({})
     print("summoners 데이터 업데이트")      
       
