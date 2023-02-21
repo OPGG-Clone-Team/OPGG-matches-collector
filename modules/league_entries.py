@@ -8,6 +8,7 @@ import logging
 logger = logging.getLogger("app")
 
 col = "league_entries"
+day = 60*60*24
 
 def updateAll(db):
   
@@ -25,7 +26,7 @@ def updateAll(db):
     #   소환사 정보가 존재하지 않거나 오래됐으면 갱신
     summonerInfo = summoner.findBySummonerId(db, entry["summonerId"])
     if not summonerInfo:
-      logger.debug("DB에 소환사 정보가 조회되지 않아 업데이트합니다.")
+      logger.info("DB에 소환사 정보가 조회되지 않아 업데이트합니다.")
       summonerInfo = summoner.updateBySummonerId(db, entry["summonerId"])
     else:
       logger.debug("기존 소환사 정보 유효성 검증")
@@ -33,8 +34,10 @@ def updateAll(db):
       # summoner update
       if summonerInfo["name"]!= entry["summonerName"]:
         logger.debug(f"소환사 이름이 서로 다릅니다.")
-        timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).days
-        if timeDiff >= 1:
+        timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).seconds
+        if timeDiff >= day:
+          logger.info("리그 엔트리 소환사명 : %s, summoners collection 소환사명 : %s",entry["summonerName"], summonerInfo["name"])
+          
           summonerInfo = summoner.updateBySummonerId(db, entry["summonerId"])
     
     entry["rank"] = rank

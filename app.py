@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 import os
 from config.mongo import mongoClient
+
+app=Flask(__name__)
 log_dir = './logs'
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
-from utils import initialize_logger
+import utils.initialize_logger
+import logging
 from flask_request_validator import *
 from error.error_handler import error_handle
 from error.custom_exception import *
@@ -14,18 +17,12 @@ from flask_api import status
 from config.config import config
 
 from scheduler import start_schedule
-import logging
 from modules import summoner, league_entries, match, summoner_matches
 
-
-app=Flask(__name__)
-
-# 기본 앱 환경 가져오기
-config_type = os.getenv("FLASK_ENV") if os.getenv("FLASK_ENV") else "default"
-app.config.from_object(config[config_type])
-
-# 로거 설정
 logger = logging.getLogger("app")
+# 기본 앱 환경 가져오기
+config_type = os.getenv("APP_ENV") if os.getenv("APP_ENV") else "default"
+app.config.from_object(config[config_type])
 
 # app 공통 에러 핸들러 추가
 error_handle(app)
@@ -63,7 +60,7 @@ def updateSummoner(valid: ValidRequest):
   summonerName = valid.get_json()['summonerName']
   
   # 만약 갱신시각이 현재시간과 비교해서 2분 이하로 차이난다면 단순 db 조회 후 리턴
-  summonerInfo = summoner.find(db, summonerName)
+  summonerInfo = summoner.findBySummonerName(db, summonerName)
   if not summonerInfo:
     summonerInfo = summoner.updateBySummonerName(db, summonerName)
   else:
@@ -114,7 +111,7 @@ def updateSummonerMatches(valid: ValidRequest):
   startIdx = parameters["startIdx"]
   size = parameters["size"]
   
-  summonerInfo = summoner.find(db, summonerName)
+  summonerInfo = summoner.findBySummonerName(db, summonerName)
   if not summonerInfo:
     summonerInfo = summoner.updateBySummonerName(db, summonerName)
   else:
@@ -164,7 +161,7 @@ def getSummonerAndMatches(valid: ValidRequest):
   startIdx = parameters["startIdx"]
   size = parameters["size"]
   
-  summonerInfo = summoner.find(db, summonerName)
+  summonerInfo = summoner.findBySummonerName(db, summonerName)
   matchIds = summoner_matches.findRecentMatchIds(db, summonerInfo["puuid"], startIdx, size)
   matches = match.findOrUpdateAll(db, matchIds)
   
@@ -242,7 +239,7 @@ start_schedule([
   {
     "job":leagueEntriesBatch,
     "method":"interval", 
-    "time":1
+    "time":2
   },
   {
     "job":summonerBatch,
@@ -261,6 +258,5 @@ def test():
 if __name__ == "__main__":
   app.run(
     host = app.config["FLASK_HOST"], 
-    port=app.config["FLASK_PORT"],
-    debug=False)
+    port=app.config["FLASK_PORT"])
   

@@ -26,8 +26,6 @@ def getSummonerMatches(puuid, start=0, count = 20):
   url = f"https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}"
   headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
   
-  print(f'다음으로 request : {url}')
-  
   result = delayeableRequest(url, headers, 10)
   
   return result
@@ -51,8 +49,6 @@ def getMatchAndTimeline(matchId):
   
   url = f"https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}"
   headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
-  
-  print(f'다음으로 request : {url}')
   
   # 여기서부터는 필수 정보 제외하고 죄다 갖다 버리기
   

@@ -1,6 +1,7 @@
 */__pycache__
 data
 dev-data
+dev-logs
 test.py
 .vscode
 __pycache__

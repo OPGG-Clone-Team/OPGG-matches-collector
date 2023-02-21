@@ -67,11 +67,11 @@ def updateAll(db):
   logger.info(f"성공적으로 {len(league_entries)}명의 소환사 정보를 업데이트했습니다.")
   return len(league_entries)
 
-def find(db, summonerName):
+def findBySummonerName(db, summonerName):
   summoner = db[col].find_one({"name":summonerName}, {"_id":0, "accountId":0, "id":0})
   
   if not summoner:
-    raise DataNotExists("summoners에 해당 이름을 가진 소환사 정보가 없습니다.")
+    raise DataNotExists("DB에 해당 이름을 가진 소환사 정보가 없습니다.")
   
   return summoner
 

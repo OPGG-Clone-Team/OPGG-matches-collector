@@ -8,7 +8,7 @@ class Config:
   LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
 class DevelopmentConfig(Config):
     # FLASK_ENV = development
-    DEBUG=True
+    DEBUG=False
     MONGO_HOST =os.environ.get("DEV_MONGO_HOST")
     MONGO_PORT= os.environ.get("DEV_MONGO_PORT")
     MONGO_USERNAME= os.environ.get("DEV_MONGO_USERNAME")
@@ -21,8 +21,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
   # FLASK_ENV = production
-  # TODO - 구체적인 시스템 설계단계 끝나기 전까지는 debug 모드로 작동
-    DEBUG = True
+    DEBUG = False
     MONGO_HOST =os.environ.get("MONGO_HOST")
     MONGO_PORT= os.environ.get("MONGO_PORT")
     MONGO_USERNAME= os.environ.get("MONGO_USERNAME")
@@ -34,7 +33,7 @@ class ProductionConfig(Config):
 
 class TestConfig(Config):
     # 테스트 환경, FLASK_ENV = test
-    DEBUG=True
+    DEBUG=False
     MONGO_HOST =os.environ.get("MONGO_HOST")
     MONGO_PORT= os.environ.get("MONGO_PORT")
     MONGO_USERNAME= os.environ.get("MONGO_USERNAME")

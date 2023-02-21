@@ -28,3 +28,6 @@ test.py
 # log file
 logs/
 logs/*
+/dev-logs
+/dev-logs.*
+

@@ -4,12 +4,14 @@ version: "3.8"
 services:
   # 배치서버
   batch-server:
+    container_name: matches-collector
     build:
       # context : 도커파일 위치
       # dockerfile : 도커파일 경로
       context: .
       dockerfile: Dockerfile-batch
-    container_name: matches-collector
+    # command: python -u app.py
+    restart: unless-stopped
     ports:
       - 5001:5001
     depends_on:
@@ -21,6 +23,8 @@ services:
       - ./env/common.env
     environment:
       - TZ=Asia/Seoul
+    volumes:  
+      - ./dev-logs:/app/logs # 로컬 디렉토리 하위의 ./dev-data와 컨테이너 안의 /data/db를 매핑
   # 몽고DB
   mongodb:
     image: mongo
