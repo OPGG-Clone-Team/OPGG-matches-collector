@@ -1,34 +1,30 @@
 from flask import Flask, jsonify, request
 import os
-from config.mongo import mongoClient
+from config.mongo import mongoClient # 데이터베이스 연동
 
 app=Flask(__name__)
-log_dir = './logs'
+
+log_dir = './logs' # 로그 남길 디렉토리 (없으면 자동으로 생성)
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
-import utils.initialize_logger
+    
+import utils.initialize_logger # 로거 최초 동작
 import logging
-from flask_request_validator import *
-from error.error_handler import error_handle
-from error.custom_exception import *
-from utils.date_calc import timeDifToMinute
-from flask_api import status
-# 최초 환경변수 파일 로드
-from config.config import config
-
-from scheduler import start_schedule
+from flask_request_validator import * # parameter validate
+from error.error_handler import error_handle # flask에 에러핸들러 등록
+from error.custom_exception import * # custom 예외
+from config.config import config # 최초 환경변수 파일 로드
+from scheduler import start_schedule # 스케줄러 로드
 from modules import summoner, league_entries, match, summoner_matches
 
-logger = logging.getLogger("app")
-# 기본 앱 환경 가져오기
+logger = logging.getLogger("app") # 로거
+
 config_type = os.getenv("APP_ENV") if os.getenv("APP_ENV") else "default"
-app.config.from_object(config[config_type])
+app.config.from_object(config[config_type]) # 기본 앱 환경 가져오기
 
-# app 공통 에러 핸들러 추가
-error_handle(app)
+error_handle(app) # app 공통 에러 핸들러 추가
 
-# MONGO DB  
-db = mongoClient(app).LEAGUEDATA
+db = mongoClient(app).LEAGUEDATA # pymongo connection
 
 # Param의 request_parameter_type
 # GET : 쿼리 파라미터
@@ -36,6 +32,7 @@ db = mongoClient(app).LEAGUEDATA
 # JSON : body로 들어온 값
 # PATH : Path 파라미터
 
+# TODO - summonerName trim()처리
 @app.route('/summoner', methods=["PATCH"], endpoint="updateSummoner")
 @validate_params(
     # TODO - 정규표현식 추가하기
@@ -43,15 +40,15 @@ db = mongoClient(app).LEAGUEDATA
 )
 def updateSummoner(valid: ValidRequest):
   """
-  업데이트된 소환사 정보 보내주기
+  소환사 정보 업데이트 후 보내주기
   
-  Body(json):
-      summonerName(str)
+  RequestBody(json):
+      summonerName(str) : 소환사이름 
   
   Returns:
       {
         name(String) : 소환사 이름
-        profileIconId(Integer) : 소환사 프로필 아이콘 ID (with CDN)
+        profileIconId(Integer) : 소환사 프로필 아이콘 ID
         puuid(Integer) : 소환사 puuid
         revisionDate(Integer, epoch milliseconds) : 소환사 정보 최종 수정일
         summonerLevel(Integer) : 소환사 레벨
@@ -59,20 +56,8 @@ def updateSummoner(valid: ValidRequest):
   """
   summonerName = valid.get_json()['summonerName']
   
-  # 만약 갱신시각이 현재시간과 비교해서 2분 이하로 차이난다면 단순 db 조회 후 리턴
-  summonerInfo = summoner.findBySummonerName(db, summonerName)
-  if not summonerInfo:
-    summonerInfo = summoner.updateBySummonerName(db, summonerName)
-  else:
-    timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).seconds
-    if timeDiff < 60*2:
-      # TODO - 나중에 다른 에러로 고치기
-      raise CustomUserError(f"{timeDiff}초 전에 이미 소환사 정보를 갱신했습니다.", "Trying update too frequently", status.HTTP_400_BAD_REQUEST)
-  
   result = summoner.updateBySummonerName(db, summonerName)
   
-  # 필요없는 정보 제거
-  del(result["updatedAt"])
   return jsonify(result)
   
 
@@ -89,9 +74,9 @@ def updateSummonerMatches(valid: ValidRequest):
   업데이트된 최근 소환사의 전적 가져오기
 
   Body(json):
-      summonerName(String, required)
-      startIdx(Integer, Default to 0) : 검색 시작 인덱스
-      size(Integer, Default to 30) : 검색할 인덱스 수
+      summonerName (str)
+      startIdx (int, Default to 0) : 검색 시작 인덱스
+      size (int, Default to 30) : 검색할 인덱스 수
 
   Returns:
       {
@@ -111,19 +96,9 @@ def updateSummonerMatches(valid: ValidRequest):
   startIdx = parameters["startIdx"]
   size = parameters["size"]
   
-  summonerInfo = summoner.findBySummonerName(db, summonerName)
-  if not summonerInfo:
-    summonerInfo = summoner.updateBySummonerName(db, summonerName)
-  else:
-    # 만약 갱신시각이 현재시간과 비교해서 2분 이하로 차이난다면 단순 db 조회 후 리턴
-    timeDiff = timeDifToMinute(summonerInfo["updatedAt"]).seconds
-    if timeDiff < 60*2:
-      # TODO - 나중에 다른 에러로 고치기
-      raise CustomUserError(f"{timeDiff}초 전에 이미 소환사 정보를 갱신했습니다.", "Trying update too frequently", status.HTTP_400_BAD_REQUEST)
+  # 2023/02/24 수정 : 무조건 소환사 정보 같이 업데이트 해주는게 나을 듯
+  summonerInfo = summoner.updateBySummonerName(db, summonerName)
   
-  # FIXME - 트랜잭션 임시 비활성화    
-  # with mongoClient(app).start_session() as session:
-  #   with session.start_transaction():
   puuid = summoner_matches.update(db, summonerName)
   
   # 최근 소환사의 matchId 가져오기
@@ -170,8 +145,6 @@ def getSummonerAndMatches(valid: ValidRequest):
     "matches":matches
     })
 
-# TODO - 현재 Riot Api에서 league_entries 소환사이름정보와 summoner 소환사이름정보가 불일치하는 현상 발생
-# 추후 API 재발급 시 고려해봐야 할듯
 @app.route('/league-entry', methods=["GET"], endpoint="getLeagueEntries")
 @validate_params(
     Param('page', GET, int, default=1, required=False, rules=[ValidateStartIdxParam()]),
@@ -194,66 +167,40 @@ def leagueEntriesBatch():
   Returns:
       updated(int) : 마스터 이상 유저 업데이트수
   """
-  # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
-  
+
   logger.info("랭킹정보 갱신 시작")
   updated_summoner_count=league_entries.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
 
-@app.route('/batch/summoner', methods=["POST"])
-def summonerBatch(): # 배치 수행
-  """수동 배치돌리기
-  league_entries 내에 있는 소환사 정보 모두 업데이트해주기
-  실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
-  
-  Returns:
-      updated(int) : 마스터 이상 유저 업데이트수
-  """
-  # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
-  
-  logger.info("소환사 정보 전체 갱신 시작")
-  updated_summoner_count=summoner.updateAll(db)
-  return {"status":"ok","updated":updated_summoner_count}
 
-@app.route('/batch/match', methods=["POST"])
-def matchBatch(): # 배치 수행
-  """수동 배치돌리기
-  소환사 정보 내에 있는 모든 소환사들의 summoner_match와 match정보를 업데이트
-  실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
+# TODO - 추후 개발
+# @app.route('/batch/match', methods=["POST"])
+# def matchBatch(): # 배치 수행
+#   """수동 배치돌리기
+#   소환사 정보 내에 있는 모든 소환사들의 summoner_match와 match정보를 업데이트
+#   실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
   
-  Returns:
-      updated(int) : 마스터 이상 유저 업데이트수
-  """
-  # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
+#   Returns:
+#       updated(int) : 마스터 이상 유저 업데이트수
+#   """
+#   # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
   
-  # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
-  # with mongoClient(app).start_session() as session:
-  #   with session.start_transaction():
-  updated_summoner_count=summoner.updateAll(db)
-  return {"status":"ok","updated":updated_summoner_count}
+#   # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
+#   # with mongoClient(app).start_session() as session:
+#   #   with session.start_transaction():
+#   updated_summoner_count=summoner.updateAll(db)
+#   return {"status":"ok","updated":updated_summoner_count}
 
 
 # 스케줄링 걸기
-# TODO - leagueEntriesBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
+# TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
   {
     "job":leagueEntriesBatch,
     "method":"interval", 
     "time":2
   },
-  {
-    "job":summonerBatch,
-    "method":"cron",
-    # TODO - 우선 소환사 정보갱신은 새벽 4시에 주기적으로 실행하도록 설정
-    "time":4
-  },
   ])
-
-# 테스트 라우터
-@app.route('/test', methods = ["GET"])
-def test():
-  summonerName =request.args.get("summonerName")
-  return {"test":summonerName}
 
 if __name__ == "__main__":
   app.run(

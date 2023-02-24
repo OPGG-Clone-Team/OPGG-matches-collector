@@ -71,7 +71,3 @@ def findOrUpdateAll(db, matchId_list):
     result.append(findOrUpdate(db, matchId))
     
   return result
-    
-# if __name__=="__main__":
-#   findOrUpdate("KR_6336134778")
-    

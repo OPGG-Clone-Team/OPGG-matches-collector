@@ -1,7 +1,7 @@
 import os
 from error import custom_exception
 from flask_api import status
-from riot_requests.common import delayeableRequest
+from riot_requests.common import delayableRequest
 
 def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   """
@@ -9,7 +9,7 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   50 requests every 10 seconds
 
   Args:
-      league (str, required): should be in ["challengerleagues", "grandmasterleagues","masterleagues"].
+      league (str): should be in ["challengerleagues", "grandmasterleagues","masterleagues"].
       queue (str, optional): 조회할 큐 선택, Defaults to "RANKED_SOLO_5x5".
 
   Returns:
@@ -34,7 +34,7 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
 
   ## delayable
-  result = delayeableRequest(url, headers, 10)
+  result = delayableRequest(url, headers, 20)
   entries = result["entries"]
   
   if not entries or not isinstance(entries, list):
@@ -42,8 +42,10 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
       "리그 엔트리 정보를 가져오는 데 실패했습니다.", 
       "Result of request to Riot not exists", status.HTTP_404_NOT_FOUND )
 
+  # TODO - 요구사항 확장 시 이부분은 고쳐야함
   entries.sort(key = lambda x : x["leaguePoints"], reverse=True)
-  # 티어, 큐, 순위 업데이트
+  
+  # 티어, 큐 업데이트
   for entry in entries:
     entry["queue"] = league[:-7]
     entry["tier"] = entry["rank"]

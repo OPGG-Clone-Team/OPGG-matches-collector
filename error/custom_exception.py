@@ -29,6 +29,12 @@ class RateLimiteExceededError(CustomUserError):
         self.status_code = status.HTTP_429_TOO_MANY_REQUESTS
         self.error_message = error_message
         self.error_type = "Rate Limit Exceeded"
+        
+class TooManySummonerRequest(CustomUserError):
+    def __init__(self, error_message):
+        self.status_code = status.HTTP_429_TOO_MANY_REQUESTS
+        self.error_message = error_message
+        self.error_type = "Trying to update too frequently"
 
 class DataNotExists(CustomUserError):
     def __init__(self, error_message):

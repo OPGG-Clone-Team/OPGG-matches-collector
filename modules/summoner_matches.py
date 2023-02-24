@@ -1,19 +1,18 @@
 from riot_requests import match_v4
 from error.custom_exception import *
 
-# LEAGUEDATA db의 summoner_matches 담당
 col = "summoner_matches"
 
 def update(db, summonerName):
   """
-  소환사의 최근 match Id 리스트를 DB에 업데이트
+  소환사의 최근 match Id 리스트를 업데이트
 
   Args:
-      db (mongoClient): mongoDB connection
-      summonerName (String): 소환사이름
+      db (connection)
+      summonerName (str)
 
   Raises:
-      Exception: _description_
+      DataNotExists
   
   Returns:
       puuid (str) : 소환사의 puuid

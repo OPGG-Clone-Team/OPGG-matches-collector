@@ -13,7 +13,8 @@ class MyTimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
   def __init__(self,dir_log, when):
    self.dir_log = dir_log
    filename =  self.dir_log+time.strftime("%Y-%m-%d_%H:%M")+".log" #dir_log here MUST be with os.sep on the end
-   logging.handlers.TimedRotatingFileHandler.__init__(self,filename, when=when, backupCount=100, encoding="utf-8")
+   # FIXME - 현재 backupCount가 작동하지 않는 것 같음, 알아보기
+   logging.handlers.TimedRotatingFileHandler.__init__(self,filename, when=when, backupCount=100, encoding="utf-8", interval=10)
   def doRollover(self):
    """
    TimedRotatingFileHandler remix - rotates logs on daily basis, and filename of current logfile is time.strftime("%m%d%Y")+".txt" always
@@ -70,5 +71,5 @@ flask_logger.propagate=False
 flask_logger.addHandler(time_rotating_handler)
 flask_logger.addHandler(console_handler)
 
-# logging.basicConfig(handlers=[time_rotating_handler, console_handler], level=level)
-# logging.Logger.propagate = False
+def appLogger():
+  return logger
