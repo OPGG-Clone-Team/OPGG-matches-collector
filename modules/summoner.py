@@ -2,7 +2,7 @@ from riot_requests import summoner_v4
 from error.custom_exception import TooManySummonerRequest, DataNotExists
 import datetime
 import logging
-from utils.date_calc import timeDiff
+from utils.date_calc import lastModifiedFromNow
 from modules import league_entries
 
 logger = logging.getLogger("app")
@@ -36,7 +36,7 @@ def updateBySummonerName(db, summonerName):
     summoner = summoner_v4.requestSummonerByName(summonerName)
   else:
     # 2-1. 조회 후 updatedAt 시각이 2분이 지나지 않았으면 에러 발생시키기
-    timeDiff = timeDiff(summoner_info["updatedAt"]).seconds
+    timeDiff = lastModifiedFromNow(summoner_info["updatedAt"]).seconds
     if timeDiff < 60*2:
       raise TooManySummonerRequest(f"{timeDiff}초 전에 이미 소환사 정보를 갱신했습니다.")
 

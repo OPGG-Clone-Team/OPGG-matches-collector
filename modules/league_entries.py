@@ -1,7 +1,7 @@
 from riot_requests import league_v4
 from error.custom_exception import DataNotExists, RequestDataNotExists
 from modules import summoner
-from utils.date_calc import timeDiff
+from utils.date_calc import lastModifiedFromNow
 import logging
 
 logger = logging.getLogger("app")
@@ -38,7 +38,7 @@ def updateAll(db):
     
     else: # 조회한 소환사 이름이 서로 다르고, summonerInfo의 갱신 시간이 24시간 이상 지났다면 summoner update
       if summoner_info["name"] != entry["summonerName"] \
-        and timeDiff(summoner_info["updatedAt"], utc=False).seconds >= day:
+        and lastModifiedFromNow(summoner_info["updatedAt"], utc=False).seconds >= day:
         logger.info("리그 엔트리 소환사명 : %s, summoners collection 소환사명 : %s",
                     entry["summonerName"], summoner_info["name"])
         summoner_info = summoner.updateBySummonerBrief(db, entry)

@@ -1,6 +1,6 @@
 import datetime
 
-def timeDiff(updated_at, utc=True):
+def lastModifiedFromNow(updated_at, utc=True):
   """현재 시간과 최종 수정일간의 날짜 차이를 계산\n
   [중요!!] UTC 시간을 기준으로 계산이 기본값
 
