@@ -3,7 +3,7 @@ from error.custom_exception import *
 
 col = "summoner_matches"
 
-def update(db, summonerName):
+def update(db, summonerName=None, summonerId=None):
   """
   소환사의 최근 match Id 리스트를 업데이트
 
@@ -17,7 +17,10 @@ def update(db, summonerName):
   Returns:
       puuid (str) : 소환사의 puuid
   """
-  summoner = db["summoners"].find_one({"name": summonerName})
+  if summonerName:
+    summoner = db["summoners"].find_one({"name": summonerName})  
+  elif summonerId:
+    summoner = db["summoners"].find_one({"id": summonerId})  
   
   if not summoner:
     raise DataNotExists("데이터베이스에서 소환사 정보를 찾을 수 없습니다.")
@@ -63,7 +66,7 @@ def update(db, summonerName):
 
   return summoner["puuid"]
 
-def findRecentMatchIds(db, puuid, startIdx=0, size=30):
+def findRecentMatchIds(db, puuid, startIdx=0, size=30, no_limit=False):
   """
   소환사의 최근 Match Id 리스트를 반환
 
@@ -72,7 +75,8 @@ def findRecentMatchIds(db, puuid, startIdx=0, size=30):
       puuid (str): 소환사 puuid
       startIdx (int, optional): 시작할 인덱스 위치. Defaults to 0.
       size (int, optional): 가져올 Match Id 개수. Defaults to 30.
-
+      no_limit (bool, optional): size를 고려하지 않고 전부 가져오기. Defaults to False
+      
   Returns:
       matchIds(list): 소환사의 최근 Match Id 리스트
   """
@@ -80,14 +84,13 @@ def findRecentMatchIds(db, puuid, startIdx=0, size=30):
   
   if not summonerMatches:
     return []
-  
   else:
     summonerMatches = summonerMatches["summoner_match_ids"]
-    if len(summonerMatches)<size+startIdx:
+    
+    if no_limit:
+      return summonerMatches
+    elif len(summonerMatches)<size+startIdx:
       return summonerMatches[startIdx:]
     else:
       return summonerMatches[startIdx:size+startIdx]
   
-  
-if __name__=="__main__":
-  update("칼과 창 방패")

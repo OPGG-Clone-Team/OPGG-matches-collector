@@ -13,7 +13,7 @@ def start_schedule(batchList):
       schedule.add_job(batch["job"], "interval", minutes = batch["time"], id = batch["job"].__name__, replace_existing=False)
     # 매일 4시에 돌아가게 변경
     elif batch["method"]=="cron":
-      schedule.add_job(batch["job"], "cron", hour = batch["time"], id = batch["job"].__name__, replace_existing=True)
+      schedule.add_job(batch["job"], "cron", **batch["time"], id = batch["job"].__name__, replace_existing=True)
   
   schedule.start()
     

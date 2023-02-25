@@ -1,10 +1,13 @@
 
 from riot_requests import match_v4
+import logging
 
-# pymongo insert operation 동작 시 원본 객체에 영향을 미치는 문제 발견
+# FIXME - pymongo insert operation 동작 시 원본 객체에 영향을 미치는 문제 발견
 # https://pymongo.readthedocs.io/en/stable/faq.html#writes-and-ids
 # _id까지 보내주는 dump_utils 사용하거나 다시 db에서 조회하는 방법으로 가야 할듯
 # 우선은 직접 제거
+
+logger = logging.getLogger("app")
 
 def findOrUpdate(db, matchId):
   """
@@ -30,7 +33,7 @@ def findOrUpdate(db, matchId):
   match = db["matches"].find_one({"matchId":matchId}, {"_id":0})
   if match:
     # 2월 4일 수정 : 이미 있을 때는 DB에서 결과값 조회 후 반환
-    # raise Exception("이미 전적 정보가 존재합니다.")
+    
     teams = list(db["teams"].find({"matchId":matchId}, {"_id":0}))
     participants = list(db["participants"].find({"matchId":matchId}, {"_id":0}))
     timelines = list(db["participants"].find({"mathcId":matchId}, {"_id":0}))

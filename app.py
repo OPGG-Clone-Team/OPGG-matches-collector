@@ -99,7 +99,7 @@ def updateSummonerMatches(valid: ValidRequest):
   # 2023/02/24 수정 : 무조건 소환사 정보 같이 업데이트 해주는게 나을 듯
   summonerInfo = summoner.updateBySummonerName(db, summonerName)
   
-  puuid = summoner_matches.update(db, summonerName)
+  puuid = summoner_matches.updateBySummonerName(db, summonerName)
   
   # 최근 소환사의 matchId 가져오기
   matchIds = summoner_matches.findRecentMatchIds(db, puuid, startIdx, size)
@@ -174,22 +174,32 @@ def leagueEntriesBatch():
 
 
 # TODO - 추후 개발
-# @app.route('/batch/match', methods=["POST"])
-# def matchBatch(): # 배치 수행
-#   """수동 배치돌리기
-#   소환사 정보 내에 있는 모든 소환사들의 summoner_match와 match정보를 업데이트
-#   실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
+@app.route('/batch/match', methods=["POST"])
+def matchBatch(): # 전적정보 배치 수행
+  """수동 배치돌리기
+  소환사 정보 내에 있는 모든 소환사들의 summoner_match와 match정보를 업데이트
+  실행 당시의 league_entries 안에 있는 소환사들만 업데이트해주기
   
-#   Returns:
-#       updated(int) : 마스터 이상 유저 업데이트수
-#   """
-#   # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
+  Returns:
+      updated(int) : 마스터 이상 유저 업데이트수
+  """
+  # TODO Riot API Upgrade 후 league_entries에 있는 모든 소환사 및 소환사 전적정보 갱신
   
-#   # FIXME - 트랜잭션 임시 비활성화 (트랜잭션을 중간과정에 삽입해야 할듯)
-#   # with mongoClient(app).start_session() as session:
-#   #   with session.start_transaction():
-#   updated_summoner_count=summoner.updateAll(db)
-#   return {"status":"ok","updated":updated_summoner_count}
+  # 1. league_entries 가져오기
+  summonerIds = league_entries.findAllSummonerId(db)
+  # 2. league_entries 안의 소환사 아이디를 돌아가면서 summoner_matches를 업데이트하기
+  for summonerId in [d['summonerId'] for d in summonerIds if 'summonerId' in d]:
+    try:
+      puuid = summoner_matches.update(db, summonerId = summonerId)
+      match_ids = summoner_matches.findRecentMatchIds(db, puuid)
+      
+      for match_id in match_ids:
+        match.findOrUpdate(db, match_id)
+      
+    except DataNotExists as e:
+      logger.warning("DB에 해당 소환사 정보가 존재하지 않아 다음 소환사로 넘어감")
+    
+  return {"status":"ok","message":"전적 정보 배치가 완료되었습니다."}
 
 
 # 스케줄링 걸기
@@ -200,6 +210,15 @@ start_schedule([
     "method":"interval", 
     "time":2
   },
+  
+  # 4시 정각에 돌아가도록 설정
+  {
+    "job":matchBatch,
+    "method":"cron",
+    "time":{
+      "hour":app.config["BATCH_HOUR"]
+    }
+  }
   ])
 
 if __name__ == "__main__":

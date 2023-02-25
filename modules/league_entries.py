@@ -103,3 +103,10 @@ def find(db, page=1):
     raise DataNotExists("데이터베이스에서 리그 엔트리 정보를 찾을 수 없습니다.")
 
   return results
+
+def findAllSummonerId(db):
+  summonerIds = list(db[col].find({}, {"_id":0, "summonerId":1}))
+  
+  if len(summonerIds) == 0:
+    raise DataNotExists("데이터베이스에서 리그 엔트리 정보를 찾을 수 없습니다.")
+  return summonerIds

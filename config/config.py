@@ -6,6 +6,7 @@ class Config:
   API_KEY=os.environ.get("RIOT_API_KEY_1")
   LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL")
   LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
+  BATCH_HOUR = os.environ.get("BATCH_HOUR")
 class DevelopmentConfig(Config):
     # FLASK_ENV = development
     DEBUG=False
