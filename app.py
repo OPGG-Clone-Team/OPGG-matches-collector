@@ -100,16 +100,19 @@ def updateSummonerMatches(valid: ValidRequest):
   # 2023/02/24 수정 : 무조건 소환사 정보 같이 업데이트 해주는게 나을 듯
   summonerInfo = summoner.updateBySummonerName(db, summonerName)
   
-  puuid = summoner_matches.updateBySummonerName(db, summonerName)
+  puuid = summoner_matches.update(db, summonerName = summonerName)
   
   # 최근 소환사의 matchId 가져오기
   matchIds = summoner_matches.findRecentMatchIds(db, puuid, startIdx, size)
   
   result = match.findOrUpdateAll(db, matchIds)
-
+  ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
+  
+  
   return jsonify({
     "summoner": summonerInfo,
-    "matches":result
+    "matches":result,
+    "ingame":ingame
     })
 
 
@@ -143,10 +146,12 @@ def getSummonerAndMatches(valid: ValidRequest):
   
   matchIds = summoner_matches.findRecentMatchIds(db, summonerInfo["puuid"], startIdx, size)
   matches = match.findOrUpdateAll(db, matchIds)
+  ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
   
   return jsonify({
     "summoner": summonerInfo,
-    "matches":matches
+    "matches":matches,
+    "ingame":ingame
     })
 
 @app.route('/league-entry', methods=["GET"], endpoint="getLeagueEntries")
@@ -205,9 +210,9 @@ def matchBatch(): # 전적정보 배치 수행
     
   return {"status":"ok","message":"전적 정보 배치가 완료되었습니다."}
 
-@app.route('/test', methods=["POST"])
-def test():
-  spectator_v4.requestIngameInfo()
+# @app.route('/test', methods=["POST"])
+# def test():
+#   spectator_v4.requestIngameInfo()
 
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)

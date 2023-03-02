@@ -14,6 +14,7 @@ class MyTimedRotatingFileHandler(logging.handlers.TimedRotatingFileHandler):
    self.dir_log = dir_log
    filename =  self.dir_log+time.strftime("%Y-%m-%d_%H:%M")+".log" #dir_log here MUST be with os.sep on the end
    # FIXME - 현재 backupCount가 작동하지 않는 것 같음, 알아보기
+   # FIXME - interval을 prod 환경에도 동일하게 설정하기
    logging.handlers.TimedRotatingFileHandler.__init__(self,filename, when=when, backupCount=10, encoding="utf-8", interval=10)
   def doRollover(self):
    """
