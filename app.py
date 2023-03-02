@@ -16,6 +16,7 @@ from error.custom_exception import * # custom 예외
 from config.config import config # 최초 환경변수 파일 로드
 from scheduler import start_schedule # 스케줄러 로드
 from modules import summoner, league_entries, match, summoner_matches
+from riot_requests import spectator_v4
 
 logger = logging.getLogger("app") # 로거
 
@@ -137,6 +138,9 @@ def getSummonerAndMatches(valid: ValidRequest):
   size = parameters["size"]
   
   summonerInfo = summoner.findBySummonerName(db, summonerName)
+  if not summonerInfo:
+    raise DataNotExists("DB에 소환사 정보가 없습니다.")
+  
   matchIds = summoner_matches.findRecentMatchIds(db, summonerInfo["puuid"], startIdx, size)
   matches = match.findOrUpdateAll(db, matchIds)
   
@@ -201,6 +205,9 @@ def matchBatch(): # 전적정보 배치 수행
     
   return {"status":"ok","message":"전적 정보 배치가 완료되었습니다."}
 
+@app.route('/test', methods=["POST"])
+def test():
+  spectator_v4.requestIngameInfo()
 
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)

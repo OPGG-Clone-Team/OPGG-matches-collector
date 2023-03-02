@@ -2,8 +2,6 @@ import os
 from error.custom_exception import *
 from riot_requests.common import delayableRequest
 
-headers = {"X-Riot-Token": os.getenv("RIOT_API_KEY_1")}
-
 def requestSummonerById(summonerId):
   """
   summonerId로 Summoner 정보 가져오기\n
@@ -65,7 +63,7 @@ def requestSummoner(summonerName=None, summonerId=None):
   else:
     raise AttributeError(f"{__name__}의 인자를 잘못 넘겼습니다.")
 
-  result = delayableRequest(url, headers, 20)
+  result = delayableRequest(url, 20)
   
   if "id" not in result:
     raise SummonerNotExists("소환사 정보가 존재하지 않습니다.")

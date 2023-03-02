@@ -1,11 +1,13 @@
 import requests, time
 from flask_api import status
-import logging
+import logging, os
 
 logger = logging.getLogger("app")
 
+headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
+
 # TODO - 최종 시간 제한도 걸어놔야 api 서버 상황에 대처할 수 있을 듯
-def delayableRequest(url, headers, timeout):
+def delayableRequest(url, timeout):
   """Riot API Rate Limit에 의해 지연될 수 있는 요청 Handle
 
   Args:

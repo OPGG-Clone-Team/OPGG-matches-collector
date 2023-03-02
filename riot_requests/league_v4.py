@@ -31,10 +31,9 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
     return []
   
   url = f"https://kr.api.riotgames.com/lol/league/v4/{league}/by-queue/{queue}"
-  headers={"X-Riot-Token":os.getenv("RIOT_API_KEY_1")}
 
   ## delayable
-  result = delayableRequest(url, headers, 20)
+  result = delayableRequest(url, 20)
   entries = result["entries"]
   
   if not entries or not isinstance(entries, list):

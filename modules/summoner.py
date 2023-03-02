@@ -1,4 +1,4 @@
-from riot_requests import summoner_v4
+from riot_requests import summoner_v4, spectator_v4
 from error.custom_exception import TooManySummonerRequest, DataNotExists
 import datetime
 import logging
@@ -51,6 +51,28 @@ def updateBySummonerName(db, summonerName):
       {"puuid": summoner["puuid"]},
       {"$set": summoner},
       True)
+
+  ingame_info = spectator_v4.requestIngameInfo(summoner_info["id"])
+
+  # ingame info validate 기준
+  # 1. 소환사 정보를 찾는 데 성공했지만 현재 게임 중이 아닌 경우
+  # {
+  #   "status": {
+  #       "message": "Data not found",
+  #       "status_code": 404
+  #   }
+  # }
+  # 2. 소환사 정보를 찾지 못한 경우
+  # {
+  #     "status": {
+  #         "message": "Bad Request - Exception decrypting qUgrnCloy0fSUZj9cLvLI3wOJOdz1sUv8Uo8hXOhMsMYRkg",
+  #         "status_code": 400
+  #     }
+  # }  
+  # 3. 현재 인게임중인 소환사 정보인 경우
+  # TODO - 여기 추가하기
+  
+
 
   logger.info(f"소환사 {summonerName}의 정보를 성공적으로 업데이트했습니다.")
 

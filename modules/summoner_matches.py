@@ -37,6 +37,7 @@ def update(db, summonerName=None, summonerId=None):
   # 다음 페이지 조회 시 이용하는 변수
   start_index=100
   
+  # FIXME - 버그 발생지점 (startIdx=3000000 이상으로 넘어감)
   if old_matches:
     latest_match_id = old_matches["summoner_match_ids"][0]
     
