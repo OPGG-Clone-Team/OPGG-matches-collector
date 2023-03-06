@@ -11,6 +11,7 @@ def getSummonerMatches(puuid, start=0, count = 20):
 
   2023.02.06 추가 : killParticipations가 들어오지 않는 데이터 확인, 에러 처리
   2023.02.06 추가 : participants의 assists 필드 추가
+  2023.03.06 추가 : participants의 win, gameDuration 필드 추가
 
   Args:
       puuid (str)
@@ -84,6 +85,11 @@ def getMatchAndTimeline(matchId):
       "totalKills":team["objectives"]["champion"]["kills"],
     })
   
+  if info_teams[0]["win"]=="true":
+    win_team_id=info_teams[0]["teamId"]
+  else:
+    win_team_id=info_teams[1]["teamId"]
+  
   for participant in info["participants"]:
     lane = participant["individualPosition"]
     if lane == "UTILITY":
@@ -102,6 +108,12 @@ def getMatchAndTimeline(matchId):
         killParticipation = 0
       else:
         killParticipation = round(((participant["kills"]+participant["assists"])/ total_team_kills), 2)
+    
+    # 승리 여부
+    if win_team_id == participant["teamId"]:
+      win="true"
+    else:
+      win="false"
     
     info_participants.append({
       "matchId" : matchId,
@@ -136,6 +148,9 @@ def getMatchAndTimeline(matchId):
       "item4":participant["item4"],
       "item5":participant["item5"],
       "item6":participant["item6"],
+      # 필드 두개 추가
+      "win":win,
+      "gameDuration": info["gameDuration"],
     })
   
   for initial_timeline_info in result_timeline["info"]["participants"]:

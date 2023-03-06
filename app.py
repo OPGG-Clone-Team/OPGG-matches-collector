@@ -16,7 +16,10 @@ from error.custom_exception import * # custom 예외
 from config.config import config # 최초 환경변수 파일 로드
 from scheduler import start_schedule # 스케줄러 로드
 from modules import summoner, league_entries, match, summoner_matches
+from modules.analysis import champion
 from riot_requests import spectator_v4
+from bson import json_util
+import json
 
 logger = logging.getLogger("app") # 로거
 
@@ -210,18 +213,21 @@ def matchBatch(): # 전적정보 배치 수행
     
   return {"status":"ok","message":"전적 정보 배치가 완료되었습니다."}
 
-# @app.route('/test', methods=["POST"])
-# def test():
-#   spectator_v4.requestIngameInfo()
+@app.route('/test', methods=["POST"])
+def test():
+  
+  
+  return champion.championAnalysis(db)
+  # return json.loads(json_util.dumps(result))
 
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
-  {
-    "job":leagueEntriesBatch,
-    "method":"interval", 
-    "time":2
-  },
+  # {
+  #   "job":leagueEntriesBatch,
+  #   "method":"interval", 
+  #   "time":2
+  # },
   
   # 4시 정각에 돌아가도록 설정
   {

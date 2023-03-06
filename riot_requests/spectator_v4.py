@@ -27,7 +27,7 @@ def requestIngameInfo(summonerId):
   #     }
   # }  
   if("status" in request and
-    request["status"]["status_code"] in [status.HTTP_400_BAD_REQUEST,status.HTTP_404_NOT_FOUND]):
+    request["status"]["status_code"] in [status.HTTP_400_BAD_REQUEST,status.HTTP_404_NOT_FOUND, status.HTTP_403_FORBIDDEN]):
     logger.info("소환사 인게임 정보가 존재하지 않거나 소환사 정보가 존재하지 않습니다.")
     return {}
   
