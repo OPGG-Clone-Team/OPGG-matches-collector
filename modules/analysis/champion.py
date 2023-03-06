@@ -9,7 +9,6 @@ logger = logging.getLogger("app")
 def championAnalysis(db):
   # 1. total_plays 구하기
   total_plays = db["matches"].estimated_document_count()
-  print()
   # 2. champion_id, position으로 분류하기
   pipeline_with_lane = [
     {

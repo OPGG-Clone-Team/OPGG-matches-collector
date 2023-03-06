@@ -223,11 +223,11 @@ def test():
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
-  # {
-  #   "job":leagueEntriesBatch,
-  #   "method":"interval", 
-  #   "time":2
-  # },
+  {
+    "job":leagueEntriesBatch,
+    "method":"interval", 
+    "time":2
+  },
   
   # 4시 정각에 돌아가도록 설정
   {
