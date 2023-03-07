@@ -220,6 +220,33 @@ def test():
   return champion.championAnalysis(db)
   # return json.loads(json_util.dumps(result))
 
+@app.route("/test2", methods=["POST"])
+def test2():
+  from riot_requests.common import delayableRequest
+  matchId = "KR_6383676778"
+  url = f"https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}"
+  result = delayableRequest(url = url,timeout=10)
+  toShows = {
+    "100":[],
+    "200":[]
+  }
+  
+  for participant in result["info"]["participants"]:
+    toShow = {
+      "participantId":participant["participantId"],
+      "championName":participant["championName"],
+      "lane":participant["lane"],
+      "individualPosition":participant.get("individualPosition", "None"),
+      "role":participant["role"],
+      "teamPosition":participant["teamPosition"],
+    }
+    if participant["teamId"]==100:
+      toShows["100"].append(toShow)
+    else:
+      toShows["200"].append(toShow)
+    
+
+  return toShows
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([

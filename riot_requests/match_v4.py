@@ -2,7 +2,9 @@
 from error import custom_exception
 from flask_api import status
 from riot_requests.common import delayableRequest
+import logging
 
+logger = logging.getLogger("app")
 
 def getSummonerMatches(puuid, start=0, count = 20):
   """
@@ -91,9 +93,15 @@ def getMatchAndTimeline(matchId):
     win_team_id=info_teams[1]["teamId"]
   
   for participant in info["participants"]:
-    lane = participant["individualPosition"]
-    if lane == "UTILITY":
-      lane = "SUPPORT"
+    lane = participant["teamPosition"]
+    # if lane == "UTILITY":
+    #   lane = "SUPPORT"
+    
+    if lane not in ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"]:
+      logger.warning(f"잘못된 라인 정보가 들어왔습니다. {lane}")
+    else:
+      if lane == "UTILITY":
+        lane=="SUPPORT"
     
     challenges=participant["challenges"]
     
