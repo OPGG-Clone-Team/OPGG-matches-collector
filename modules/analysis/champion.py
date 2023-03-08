@@ -58,7 +58,7 @@ def championAnalysis(db):
   pipeline_total = [
     {
       "$match":{
-        { "gameDuration": { "$gte" : 240 }}  
+        "gameDuration": { "$gte" : 240 }
       }
     },
     {
