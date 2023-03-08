@@ -1,6 +1,7 @@
 import requests, time
 from flask_api import status
 import logging, os
+from error.custom_exception import ForbiddenError
 
 logger = logging.getLogger("app")
 
@@ -22,6 +23,9 @@ def delayableRequest(url, timeout):
   logger.info(f'다음으로 request : {url}')  
   request = requests.get(url, headers=headers, timeout=timeout)
   
+  if request.status_code == status.HTTP_403_FORBIDDEN:
+    raise ForbiddenError("Riot API key가 만료되었습니다.")
+  
   # API Rate Limit을 초과하지 않을 때까지 계속 반복, timeout만큼 polling
   while request.status_code == status.HTTP_429_TOO_MANY_REQUESTS:
     logger.info("다시 호출")
@@ -29,5 +33,7 @@ def delayableRequest(url, timeout):
     
     time.sleep(timeout)
     request = requests.get(url, headers=headers, timeout=timeout)
+  
+  
   
   return request.json()

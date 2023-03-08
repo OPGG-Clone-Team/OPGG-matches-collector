@@ -36,6 +36,12 @@ class TooManySummonerRequest(CustomUserError):
         self.error_message = error_message
         self.error_type = "Trying to update too frequently"
 
+class ForbiddenError(CustomUserError):
+    def __init__(self, error_message):
+        self.status_code = status.HTTP_403_FORBIDDEN
+        self.error_message = error_message
+        self.error_type = "Using forbidden api key"
+
 class DataNotExists(CustomUserError):
     def __init__(self, error_message):
         self.status_code = status.HTTP_404_NOT_FOUND

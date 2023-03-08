@@ -2,6 +2,9 @@ import os
 from error import custom_exception
 from flask_api import status
 from riot_requests.common import delayableRequest
+import logging
+
+logger = logging.getLogger("app")
 
 def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   """
@@ -32,6 +35,7 @@ def get_specific_league(league, queue="RANKED_SOLO_5x5"):
   
   url = f"https://kr.api.riotgames.com/lol/league/v4/{league}/by-queue/{queue}"
 
+  
   ## delayable
   result = delayableRequest(url, 20)
   entries = result["entries"]
