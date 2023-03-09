@@ -2,7 +2,9 @@ from flask import Flask, jsonify, request
 import os
 from config.mongo import mongoClient # 데이터베이스 연동
 
-app=Flask(__name__)
+app=Flask(__name__, 
+    static_url_path='', 
+    static_folder='web/static')
 
 log_dir = './logs' # 로그 남길 디렉토리 (없으면 자동으로 생성)
 if not os.path.exists(log_dir):
@@ -269,5 +271,5 @@ start_schedule([
 if __name__ == "__main__":
   app.run(
     host = app.config["FLASK_HOST"], 
-    port=app.config["FLASK_PORT"])
+    port=app.config["FLASK_PORT"],)
   
