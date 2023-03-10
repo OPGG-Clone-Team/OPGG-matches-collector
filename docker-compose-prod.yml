@@ -37,6 +37,17 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=1234 
       - MONGO_INITDB_DATABASE=LEAGUEDATA
+
+  # Redis
+  cachedb:
+    image: redis
+    container_name: cachedb
+    labels:
+        - "name=redis"
+        - "mode=standalone"
+    command: redis-server --port 6379
+    ports:
+      - 6379:6379
 #     networks:
 #       - privateNetwork
 

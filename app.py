@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import os
 from config.mongo import mongoClient # 데이터베이스 연동
+from config.redis import redisClient
 
 app=Flask(__name__, 
     static_url_path='', 
@@ -31,6 +32,7 @@ app.config.from_object(config[config_type]) # 기본 앱 환경 가져오기
 error_handle(app) # app 공통 에러 핸들러 추가
 
 db = mongoClient(app).LEAGUEDATA # pymongo connection
+redis = redisClient(app)
 
 # Param의 request_parameter_type
 # GET : 쿼리 파라미터
@@ -217,38 +219,22 @@ def matchBatch(): # 전적정보 배치 수행
 
 @app.route('/test', methods=["POST"])
 def test():
-  
-  
   return champion.championAnalysis(db)
   # return json.loads(json_util.dumps(result))
 
 @app.route("/test2", methods=["POST"])
 def test2():
-  from riot_requests.common import delayableRequest
-  matchId = "KR_6383676778"
-  url = f"https://asia.api.riotgames.com/lol/match/v5/matches/{matchId}"
-  result = delayableRequest(url = url,timeout=10)
-  toShows = {
-    "100":[],
-    "200":[]
-  }
+  summonerName = "Hide on bush"
+  summoner.updateBySummonerName(db, summonerName)
   
-  for participant in result["info"]["participants"]:
-    toShow = {
-      "participantId":participant["participantId"],
-      "championName":participant["championName"],
-      "lane":participant["lane"],
-      "individualPosition":participant.get("individualPosition", "None"),
-      "role":participant["role"],
-      "teamPosition":participant["teamPosition"],
-    }
-    if participant["teamId"]==100:
-      toShows["100"].append(toShow)
-    else:
-      toShows["200"].append(toShow)
-    
+  puuid = summoner_matches.update(db, summonerName = summonerName)
+  results = match.findOrUpdateAll(db,summoner_matches.findRecentMatchIds(db, puuid))
+  
+  redis.put(summonerName, results)
+  return redis.get_without_pop(summonerName)
+  
+  
 
-  return toShows
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([

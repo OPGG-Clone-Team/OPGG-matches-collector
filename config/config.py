@@ -19,6 +19,8 @@ class DevelopmentConfig(Config):
     FLASK_DEBUG = os.environ.get("DEV_FLASK_DEBUG")
     LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL")
     LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
+    REDIS_HOST = os.environ.get("REDIS_HOST")
+    REDIS_PORT = os.environ.get("REDIS_PORT")
 
 class ProductionConfig(Config):
   # FLASK_ENV = production
@@ -33,6 +35,8 @@ class ProductionConfig(Config):
     FLASK_HOST=os.environ.get("FLASK_HOST")
     LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL")
     LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
+    REDIS_HOST = os.environ.get("REDIS_HOST")
+    REDIS_PORT = os.environ.get("REDIS_PORT")
     
 class TestConfig(Config):
     # 테스트 환경, FLASK_ENV = test
@@ -48,7 +52,8 @@ class TestConfig(Config):
     FLASK_DEBUG = os.environ.get("FLASK_DEBUG")
     LOGGING_LEVEL = os.environ.get("LOGGING_LEVEL")
     LOGGING_WHEN = os.environ.get("LOGGING_WHEN")
-
+    REDIS_HOST = os.environ.get("REDIS_HOST")
+    REDIS_PORT = os.environ.get("REDIS_PORT")
 
 config = {
     "development": DevelopmentConfig,
