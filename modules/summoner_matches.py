@@ -95,3 +95,6 @@ def findRecentMatchIds(db, puuid, startIdx=0, size=30, no_limit=False):
     else:
       return summonerMatches[startIdx:size+startIdx]
   
+# start -> startMachId
+# def findRecentMatchIds():
+#   pass

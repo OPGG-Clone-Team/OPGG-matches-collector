@@ -100,7 +100,7 @@ def updateSummonerMatches(valid: ValidRequest):
   # parameter로 startIdx, size를 받고, 이 수만큼 db에서 매치정보 가져오기
   # 각각의 matchId에 대해 전적정보 갱신
   parameters = valid.get_json()
-  summonerName = parameters["summonerName"]
+  summonerName = parameters["summonerName"] # 추후 auto_complete를 통해서 보낼 정보이기 때문에 무조건 완벽함
   startIdx = parameters["startIdx"]
   size = parameters["size"]
   
@@ -115,6 +115,9 @@ def updateSummonerMatches(valid: ValidRequest):
   result = match.findOrUpdateAll(db, matchIds)
   ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
   
+  # 캐시서버 업데이트
+  logger.info(f"{summonerName} 매치정보 캐시서버에 업데이트")
+  redis.putAll(summonerName, result)
   
   return jsonify({
     "summoner": summonerInfo,
@@ -151,9 +154,25 @@ def getSummonerAndMatches(valid: ValidRequest):
   if not summonerInfo:
     raise DataNotExists("DB에 소환사 정보가 없습니다.")
   
+  ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
+  
+  # cache server 참조해서 결과가 있으면 그대로 결과값 리턴
+  cachedMatches = redis.get_without_pop(summonerName)
+  if cachedMatches!=None:
+    logger.info(f"캐시서버에서 {summonerName} 정보 확인되어 리턴")
+    return jsonify({
+      "summoner": summonerInfo,
+      "matches":cachedMatches,
+      "ingame":ingame
+    })
+  
   matchIds = summoner_matches.findRecentMatchIds(db, summonerInfo["puuid"], startIdx, size)
   matches = match.findOrUpdateAll(db, matchIds)
-  ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
+  
+  
+  # 캐시서버 갱신
+  logger.info(f"{summonerName} 매치정보 캐시서버에 업데이트")
+  redis.putAll(summonerName, matches)
   
   return jsonify({
     "summoner": summonerInfo,

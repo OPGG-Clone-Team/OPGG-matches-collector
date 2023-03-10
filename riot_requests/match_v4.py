@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger("app")
 
-def getSummonerMatches(puuid, start=0, count = 20):
+def getSummonerMatches(puuid, start=0, count = 30):
   """
   유저의 최근 전적 id 리스트 가져오기
   2000 requests every 10 seconds
@@ -18,7 +18,7 @@ def getSummonerMatches(puuid, start=0, count = 20):
   Args:
       puuid (str)
       start (int, optional): 조회 시작 index, Defaults to 0.
-      count (int, optional): 조회할 row 수, Defaults to 20.
+      count (int, optional): 조회할 row 수, Defaults to 30.
 
   Returns:
       [matchIds]: 전적 id 리스트
@@ -29,7 +29,7 @@ def getSummonerMatches(puuid, start=0, count = 20):
   
   url = f"https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?queue={queue}&type={type}&start={start}&count={count}"
   
-  result = delayableRequest(url, 20)
+  result = delayableRequest(url, 30)
   
   return result
 
