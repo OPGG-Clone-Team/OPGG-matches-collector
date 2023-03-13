@@ -32,8 +32,8 @@ app.config.from_object(config[config_type]) # 기본 앱 환경 가져오기
 error_handle(app) # app 공통 에러 핸들러 추가
 
 db = mongoClient(app).LEAGUEDATA # pymongo connection
-redis = redisClient(app)
-
+match_info_cache = redisClient(app)
+summoner_info_cache = redisClient(app)
 # Param의 request_parameter_type
 # GET : 쿼리 파라미터
 # FORM : 폼 형태로 들어온 값
@@ -117,7 +117,7 @@ def updateSummonerMatches(valid: ValidRequest):
   
   # 캐시서버 업데이트
   logger.info(f"{summonerName} 매치정보 캐시서버에 업데이트")
-  redis.putAll(summonerName, result)
+  match_info_cache.putAll(puuid, result)
   
   return jsonify({
     "summoner": summonerInfo,
@@ -157,7 +157,7 @@ def getSummonerAndMatches(valid: ValidRequest):
   ingame = spectator_v4.requestIngameInfo(summonerInfo["id"])
   
   # cache server 참조해서 결과가 있으면 그대로 결과값 리턴
-  cachedMatches = redis.get_without_pop(summonerName)
+  cachedMatches = match_info_cache.get_without_pop(summonerInfo["puuid"])
   if cachedMatches!=None:
     logger.info(f"캐시서버에서 {summonerName} 정보 확인되어 리턴")
     return jsonify({
@@ -172,7 +172,7 @@ def getSummonerAndMatches(valid: ValidRequest):
   
   # 캐시서버 갱신
   logger.info(f"{summonerName} 매치정보 캐시서버에 업데이트")
-  redis.putAll(summonerName, matches)
+  match_info_cache.putAll(summonerInfo["puuid"], matches)
   
   return jsonify({
     "summoner": summonerInfo,
@@ -192,6 +192,20 @@ def getRank(valid:ValidRequest):
   
   return jsonify(result)
 
+@app.route('/summoner/auto-complete', methods=["GET"], endpoint="autoComplete")
+@validate_params(
+    # TODO - 정규표현식 추가하기
+    Param('internalName', GET, str, required=True, rules=CompositeRule(MinLength(1), MaxLength(40))),
+)
+def autoComplete(valid:ValidRequest):
+  # make_internal을 통과함
+  internal_name = valid.get_params()["internalName"]
+  
+  summoners = summoner.findByInternalName(db, internal_name)
+  
+  
+  pass
+
 
 @app.route('/batch', methods=["POST"])
 def leagueEntriesBatch():
@@ -206,7 +220,6 @@ def leagueEntriesBatch():
   logger.info("랭킹정보 갱신 시작")
   updated_summoner_count=league_entries.updateAll(db)
   return {"status":"ok","updated":updated_summoner_count}
-
 
 # TODO - 추후 개발
 @app.route('/batch/match', methods=["POST"])
@@ -249,8 +262,8 @@ def test2():
   puuid = summoner_matches.update(db, summonerName = summonerName)
   results = match.findOrUpdateAll(db,summoner_matches.findRecentMatchIds(db, puuid))
   
-  redis.put(summonerName, results)
-  return redis.get_without_pop(summonerName)
+  match_info_cache.put(puuid, results)
+  return match_info_cache.get_without_pop(puuid)
   
   
 

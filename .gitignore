@@ -31,3 +31,7 @@ logs/*
 /dev-logs
 /dev-logs.*
 
+# riot.txt
+web/
+web/static/
+web/static/riot.txt

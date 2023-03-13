@@ -19,7 +19,7 @@ class RedisQueue(object):
 
   def put(self, key, value):  # 데이터 넣기
     
-    self.rq.lpush(key, json.dumps(value))  # left push
+    self.rq.lpush(key, json.dumps(value, ensure_ascii=False).encode('utf-8'))  # left push
     self.rq.ltrim(key, 0, self.max_size-1) # 최대크기를 초과한 경우 자르기
 
   def putAll(self, key, values):
@@ -29,14 +29,44 @@ class RedisQueue(object):
   def get_without_pop(self, key):  # 꺼낼 데이터 조회
     if self.isEmpty(key):
         return None
+    result = []
+    for i in range(self.size(key)):
+      result.append(self.rq.lindex(key, i).decode('utf-8'))
     
-    return json.loads(self.rq.lindex(key, self.size(key)-1))
+    return result
+
+class RedisDict(object):
+  def __init__(self, **redis_kwargs):
+    # """
+    #   name(key), host, port, db정보 넘겨주기
+    # """
+    self.rd = redis.StrictRedis(**redis_kwargs)
     
+  def size(self, key):  # 큐 크기 확인
+    return self.rq.llen(key)
   
-def redisClient(app):
-  return RedisQueue(
-    host = app.config.get("REDIS_HOST") or "localhost", 
-    port = int(app.config.get("REDIS_PORT")) or 6379, 
-    db = 0)
+  def isEmpty(self, key):  # 비어있는 큐인지 확인
+    return self.size(key) == 0
+
+  def put(self, key, value):  # 데이터 넣기
+    value = json.dumps(value, ensure_ascii=False).encode('utf-8')
+    self.rd.set(key, value)
+  
+  def get(self, key):  # 꺼낼 데이터 조회
+    value = self.rd.get(key).decode('utf-8')
+    return json.loads(value)
+
+def redisClient(app, db=0):
+  if db==0:
+    return RedisQueue(
+      host = app.config.get("REDIS_HOST") or "localhost", 
+      port = int(app.config.get("REDIS_PORT")) or 6379, 
+      db = db)
+    
+  elif db==1:
+    return RedisDict(
+      host = app.config.get("REDIS_HOST") or "localhost", 
+      port = int(app.config.get("REDIS_PORT")) or 6379, 
+      db = db)
 
 

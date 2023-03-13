@@ -124,7 +124,7 @@ def findBySummonerId(db, summonerId):
   Returns:
       summoner
   """
-  summoner = db["summoners"].find_one(
+  summoner = db[col].find_one(
     {'id': summonerId},
     {"_id": 0, "accountId": 0})
 
@@ -134,6 +134,17 @@ def findBySummonerId(db, summonerId):
   summoner["updatedAt"] = summoner["updatedAt"]+datetime.timedelta(hours=9)
   return summoner
 
+# startWith 전략으로 찾기
+def findByInternalName(db, internal_name):
+  summoners = list(db[col].find(
+    {"internal_name":{"$regex":f"^{internal_name}"}},
+    {"_id": 0, "accountId": 0}))
+  
+  if len(summoners) == 0:
+    return []
+  
+  return summoners
+  
 
 def addSummonerField(summoner, summoner_brief):
   """summoner 객체에 랭크 정보 필드 추가
