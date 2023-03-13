@@ -31,7 +31,7 @@ class RedisQueue(object):
         return None
     result = []
     for i in range(self.size(key)):
-      result.append(self.rq.lindex(key, i).decode('utf-8'))
+      result.append(json.loads(self.rq.lindex(key, i).decode('utf-8')))
     
     return result
 
