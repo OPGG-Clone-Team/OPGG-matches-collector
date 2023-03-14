@@ -85,7 +85,7 @@ class ValidatePageParam(AbstractRule):
     
 class ValidateInternalNameParam(AbstractRule):
     def validate(self, value):
-        logger.info(value)
+        # logger.info(value)
         if not isValidInternalName(value):
             raise RuleError('internalName의 형식에 맞게 데이터를 지정하세요.')
         return makeInternalName(value)

@@ -14,16 +14,14 @@ def isValidInternalName(str):
   str = makeInternalName(str)
   
   if len(str)==0:
-    logger.info("들어온 문자가 비어 있음")
     return False
   
   p = re.compile("[^a-z0-9가-힣]")
   
   result = p.search(str)
-  if result!=None:
-    logger.info("형식에 맞지 않는 문자가 없음")
+  
+  if result==None:
     return True
   
-  logger.info("형식에 맞지 않는 문자 발견")
+  # logger.info("형식에 맞지 않는 문자 발견")
   return False
-  
