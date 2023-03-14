@@ -33,7 +33,6 @@ error_handle(app) # app 공통 에러 핸들러 추가
 
 db = mongoClient(app).LEAGUEDATA # pymongo connection
 match_info_cache = redisClient(app)
-summoner_info_cache = redisClient(app)
 # Param의 request_parameter_type
 # GET : 쿼리 파라미터
 # FORM : 폼 형태로 들어온 값
@@ -195,7 +194,7 @@ def getRank(valid:ValidRequest):
 @app.route('/summoner/auto-complete', methods=["GET"], endpoint="autoComplete")
 @validate_params(
     # TODO - 정규표현식 추가하기
-    Param('internalName', GET, str, required=True, rules=CompositeRule(MinLength(1), MaxLength(40))),
+    Param('internalName', GET, str, required=True, rules=[ValidateInternalNameParam()]),
 )
 def autoComplete(valid:ValidRequest):
   # make_internal을 통과함
@@ -203,8 +202,7 @@ def autoComplete(valid:ValidRequest):
   
   summoners = summoner.findByInternalName(db, internal_name)
   
-  
-  pass
+  return summoners
 
 
 @app.route('/batch', methods=["POST"])

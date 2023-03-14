@@ -138,7 +138,7 @@ def findBySummonerId(db, summonerId):
 def findByInternalName(db, internal_name):
   summoners = list(db[col].find(
     {"internal_name":{"$regex":f"^{internal_name}"}},
-    {"_id": 0, "accountId": 0}))
+    {"_id": 0, "accountId": 0}).limit(4))
   
   if len(summoners) == 0:
     return []

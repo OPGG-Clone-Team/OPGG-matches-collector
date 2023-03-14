@@ -9,6 +9,9 @@ def pre_auto_complete(str):
   # 조건 : 안에 영문자, 한글, 숫자, 공백만 들어갈 수 있음
   str = make_internal_name(str)
   
+  if len(str)==0:
+    return False
+  
   p = re.compile("[^a-z0-9가-힣]")
   
   result = p.search(str)

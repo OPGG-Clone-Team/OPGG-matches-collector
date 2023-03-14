@@ -63,10 +63,4 @@ def redisClient(app, db=0):
       port = int(app.config.get("REDIS_PORT")) or 6379, 
       db = db)
     
-  elif db==1:
-    return RedisDict(
-      host = app.config.get("REDIS_HOST") or "localhost", 
-      port = int(app.config.get("REDIS_PORT")) or 6379, 
-      db = db)
-
 
