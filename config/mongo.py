@@ -17,7 +17,7 @@ def create_initial_indexes(db):
   
   summoners_index = IndexModel([
     ("puuid", ASCENDING),
-    ("name", ASCENDING)
+    ("internal_name", ASCENDING)
   ], name = "summoners_index")
   
   summoner_matches_index = IndexModel([
