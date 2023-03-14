@@ -4,7 +4,7 @@ import datetime
 import logging
 from utils.date_calc import lastModifiedFromNow
 from modules import league_entries
-from utils.summoner_name import make_internal_name, pre_auto_complete
+from utils.summoner_name import makeInternalName, isValidInternalName
 
 logger = logging.getLogger("app")
 col = "summoners"
@@ -158,4 +158,4 @@ def addSummonerField(summoner, summoner_brief):
   summoner["queue"] = summoner_brief["queue"]
   summoner["tier"] = summoner_brief["tier"]
   summoner["rank"] = summoner_brief["rank"]
-  summoner["internal_name"] = make_internal_name(summoner_brief["summonerName"])
+  summoner["internal_name"] = makeInternalName(summoner_brief["summonerName"])

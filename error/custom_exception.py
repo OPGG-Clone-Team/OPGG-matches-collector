@@ -15,7 +15,7 @@
 from flask_request_validator import AbstractRule
 from flask_request_validator.exceptions import RuleError, RequiredJsonKeyError, RequestError
 from flask_api import status
-from utils.summoner_name import pre_auto_complete, make_internal_name
+from utils.summoner_name import isValidInternalName, makeInternalName
 
 
 class CustomUserError(Exception):
@@ -83,9 +83,9 @@ class ValidatePageParam(AbstractRule):
     
 class ValidateInternalNameParam(AbstractRule):
     def validate(self, value):
-        if pre_auto_complete(value):
+        if not isValidInternalName(value):
             raise RuleError('internalName의 형식에 맞게 데이터를 지정하세요.')
-        return make_internal_name(value)
+        return makeInternalName(value)
 
 # class IsStr(AbstractRule):
 #     def validate(self, value):
