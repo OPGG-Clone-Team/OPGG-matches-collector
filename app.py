@@ -179,7 +179,7 @@ def getSummonerAndMatches(valid: ValidRequest):
     "ingame":ingame
     })
 
-@app.route('/league-entry', methods=["GET"], endpoint="getLeagueEntries")
+@app.route('/league-entry', methods=["GET"], endpoint="getRank")
 @validate_params(
     Param('page', GET, int, default=1, required=False, rules=[ValidateStartIdxParam()]),
 )
