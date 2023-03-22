@@ -54,6 +54,7 @@ definitions:
 
 responses:
   200:
+    decription: OK
     schema:
       $ref: '#/definitions/SummonerInfo'
   400:

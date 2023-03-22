@@ -158,7 +158,7 @@ definitions:
         example: [ 3, 2, 1,1,1,4,3,3,3,3,4,1,1,2,2,4 ]
         description: Skill level up turns per level
         
-  Perk:
+  Perks:
     type: object
     properties:
       statPerks: 
@@ -325,16 +325,13 @@ definitions:
         items:
           $ref: '#/definitions/Match'
       ingame:
-        schema:
-          $ref: '#/definitions/Ingame'
+        $ref: '#/definitions/Ingame'
         
   
 responses:
   200:
-    examples:
-      application/json:
-        schema:
-          $ref: '#/definitions/SummonerAndMatch'
+    schema:
+      $ref: '#/definitions/SummonerAndMatch'
   400:
     description: Invalid Request or Server Error raised
     schema:

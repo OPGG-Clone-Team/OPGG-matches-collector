@@ -139,7 +139,7 @@ def updateSummonerMatches(valid: ValidRequest):
     Param('startIdx', GET, int, default=0, required=False, rules=[ValidateStartIdxParam()]),
     Param('size', GET, int, default=30, required=False, rules=[ValidateStartIdxParam()]),
 )
-@swag_from('swagyml/update_summoner_match.yml')
+@swag_from('swagyml/get_summoner_match.yml')
 def getSummonerAndMatches(valid: ValidRequest):
   """소환사 이름 받아서 "갱신되지 않은" 소환사 정보 + 소환사 전적정보를 리턴
   
@@ -278,11 +278,11 @@ def test2():
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
-  {
-    "job":leagueEntriesBatch,
-    "method":"interval", 
-    "time":2
-  },
+  # {
+  #   "job":leagueEntriesBatch,
+  #   "method":"interval", 
+  #   "time":2
+  # },
   
   # 4시 정각에 돌아가도록 설정
   {

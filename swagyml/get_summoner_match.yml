@@ -1,0 +1,42 @@
+tags:
+  - Match
+
+parameters:
+  - name: summonerName
+    in: query
+    required: true
+    type: string
+    description: Ths summoner's name
+    example: Hide on bush
+  - name: startIdx
+    in: query
+    required: false
+    type: integer
+    description: start index to search match history, 0 to 200
+    example: 0
+    default: 0
+  - name: size
+    in: query
+    required: false
+    type: integer
+    description: number of matches to search, 0 to 200
+    example: 0
+    default: 30
+
+      
+responses:
+  200:
+    schema:
+      $ref: '#/definitions/SummonerAndMatch'
+  400:
+    description: Invalid Request or Server Error raised
+    schema:
+      type: object
+      properties:
+        error_type: 
+          type: string
+          example: Invalid Request Error
+        message: 
+          type: string
+          example: put the valid vlaue as to API Requiremnets.
+
