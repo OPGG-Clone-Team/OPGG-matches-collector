@@ -8,3 +8,4 @@ flask_request_validator
 apscheduler
 datetime
 redis
+flasgger

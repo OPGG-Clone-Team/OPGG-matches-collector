@@ -1,0 +1,70 @@
+tags:
+  - Summoner
+
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      required:
+        - summonerName
+      properties:
+        summonerName:
+          type: string
+          description: Ths summoner's name
+          example: Hide on bush
+
+definitions:
+  SummonerInfo:
+    type: object
+    properties:
+      id: 
+        type: string
+        example: fcsUof3Z1k9xV5hEsZySCJs-Z8vbmyJMXPCPfmYvpCLSfg
+      internal_name: 
+        type: string
+        example: hideonbush
+      name: 
+        type: string
+        example: Hide on bush
+      profileIconId: 
+        type: integer
+        example: 6
+      puuid: 
+        type: string
+        example: 1VszWLQ491793yzCoFd6XoYMpkMyqHg3W9GLGDe8HwWsTeCItrgA-IW9d6I9MVnOhoKxvljXJZo5QQ
+      queue: 
+        type: string
+        example: challenger
+      rank: 
+        type: integer
+        example: 236
+      revisionDate: 
+        type: integer
+        example: 1679159525000
+      summonerLevel: 
+        type: integer
+        example: 645
+      tier: 
+        type: string
+        example: I
+      updatedAt: 
+        type: string
+        example: Mon, 20 Mar 2023 14:59:25 GMT
+
+responses:
+  200:
+    schema:
+      $ref: '#/definitions/SummonerInfo'
+  400:
+    description: Invalid Request or Server Error raised
+    schema:
+      type: object
+      properties:
+        error_type: 
+          type: string
+          example: Invalid Request Error
+        message: 
+          type: string
+          example: put the valid vlaue as to API Requiremnets.
+

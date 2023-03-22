@@ -1,0 +1,29 @@
+tags:
+  - Summoner
+
+parameters:
+  - in: query
+    name: internalName
+    required: true
+    type: string
+    description: Ths summoner's compacted name (Not required full name)
+    # example: hideonb
+
+responses:
+  200:
+    schema:
+      type: array
+      items:
+        $ref: '#/definitions/SummonerInfo'
+  400:
+    description: Invalid Request or Server Error raised
+    schema:
+      type: object
+      properties:
+        error_type: 
+          type: string
+          example: Invalid Request Error
+        message: 
+          type: string
+          example: put the valid vlaue as to API Requiremnets.
+

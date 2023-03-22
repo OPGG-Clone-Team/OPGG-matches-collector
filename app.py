@@ -1,16 +1,18 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, url_for, redirect
 import os
 from config.mongo import mongoClient # 데이터베이스 연동
 from config.redis import redisClient
+from flasgger import Swagger, swag_from
 
 app=Flask(__name__, 
     static_url_path='', 
     static_folder='web/static')
+swagger = Swagger(app)
 
 log_dir = './logs' # 로그 남길 디렉토리 (없으면 자동으로 생성)
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
-    
+
 import utils.initialize_logger # 로거 최초 동작
 import logging
 from flask_request_validator import * # parameter validate
@@ -38,6 +40,9 @@ match_info_cache = redisClient(app)
 # FORM : 폼 형태로 들어온 값
 # JSON : body로 들어온 값
 # PATH : Path 파라미터
+@app.route('/')
+def index():
+  return redirect(url_for('flasgger.apidocs'))
 
 # TODO - summonerName trim()처리
 @app.route('/summoner', methods=["PATCH"], endpoint="updateSummoner")
@@ -45,7 +50,8 @@ match_info_cache = redisClient(app)
     # TODO - 정규표현식 추가하기
     Param('summonerName', JSON, str, required=True, rules=CompositeRule(MinLength(2), MaxLength(40))),
 )
-def updateSummoner(valid: ValidRequest):
+@swag_from('swagyml/update_summoner.yml')
+def updateSummoner(valid:ValidRequest):
   """
   소환사 정보 업데이트 후 보내주기
   
@@ -76,6 +82,7 @@ def updateSummoner(valid: ValidRequest):
     Param('startIdx', JSON, int, default=0, required=False, rules=[ValidateStartIdxParam()]),
     Param('size', JSON, int, default=30, required=False, rules=[ValidateStartIdxParam()]),
 )
+@swag_from('swagyml/update_summoner_match.yml')
 def updateSummonerMatches(valid: ValidRequest):
   """
   업데이트된 최근 소환사의 전적 가져오기
@@ -125,13 +132,14 @@ def updateSummonerMatches(valid: ValidRequest):
     })
 
 
-@app.route('/summoner', methods=["GET"], endpoint="getSummonerAndMatches")
+@app.route('/match', methods=["GET"], endpoint="getSummonerAndMatches")
 @validate_params(
     # TODO - 정규표현식 추가하기
     Param('summonerName', GET, str, required=True, rules=CompositeRule(MinLength(2), MaxLength(40))),
     Param('startIdx', GET, int, default=0, required=False, rules=[ValidateStartIdxParam()]),
     Param('size', GET, int, default=30, required=False, rules=[ValidateStartIdxParam()]),
 )
+@swag_from('swagyml/update_summoner_match.yml')
 def getSummonerAndMatches(valid: ValidRequest):
   """소환사 이름 받아서 "갱신되지 않은" 소환사 정보 + 소환사 전적정보를 리턴
   
@@ -183,6 +191,7 @@ def getSummonerAndMatches(valid: ValidRequest):
 @validate_params(
     Param('page', GET, int, default=1, required=False, rules=[ValidateStartIdxParam()]),
 )
+@swag_from('swagyml/get_summoner_rank.yml')
 def getRank(valid:ValidRequest):
   parameters = valid.get_params()
   page = parameters["page"]
@@ -196,6 +205,7 @@ def getRank(valid:ValidRequest):
     # TODO - 정규표현식 추가하기
     Param('internalName', GET, str, required=True, rules=[ValidateInternalNameParam()]),
 )
+@swag_from('swagyml/get_summoner_by_internal_name.yml')
 def autoComplete(valid:ValidRequest):
   # make_internal을 통과함
   internal_name = valid.get_params()["internalName"]
@@ -268,11 +278,11 @@ def test2():
 # 스케줄링 걸기
 # TODO - matchBatch to cron (새벽 4시~ 이후 몇시간동안 안돌아가도록)
 start_schedule([
-  {
-    "job":leagueEntriesBatch,
-    "method":"interval", 
-    "time":2
-  },
+  # {
+  #   "job":leagueEntriesBatch,
+  #   "method":"interval", 
+  #   "time":2
+  # },
   
   # 4시 정각에 돌아가도록 설정
   {

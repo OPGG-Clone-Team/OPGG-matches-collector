@@ -1,0 +1,349 @@
+tags:
+  - Match
+
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      required:
+        - summonerName
+      properties:
+        summonerName:
+          type: string
+          description: Ths summoner's name
+          example: Hide on bush
+        startIdx:
+          type: integer
+          description: start index to search match history, 0 to 200
+          example: 0
+          default: 0
+        size:
+          type: integer
+          description: number of matches to search, 0 to 200
+          example: 30
+          default: 30
+
+definitions:
+  Participant:
+    type: object
+    properties:
+      assists:
+        type: integer
+        example: 5
+      championId: 
+        type: integer
+        example: 420
+      championName: 
+        type: string
+        example: Illaoi
+      cs:
+        type: integer
+        example: 235
+      deaths:
+        type: integer
+        example: 2
+      doubleKills: 
+        type: integer
+        example: 1
+      gameDuration: 
+        type: integer
+        example: 1788
+      goldEarned: 
+        type: integer
+        example: 13108
+      item0: 
+        type: integer
+        example: 6662
+      item1: 
+        type: integer
+        example: 3193
+      item2: 
+        type: integer
+        example: 3044
+      item3: 
+        type: integer
+        example: 3071
+      item4: 
+        type: integer
+        example: 1028
+      item5: 
+        type: integer
+        example: 3047
+      item6: 
+        type: integer
+        example: 3364
+      kda: 
+        type: string
+        example: "4.0"
+      killParticipation:  
+        type: float
+        example: 0.25806451612903225
+      kills: 
+        type: integer
+        example:  3
+      lane: 
+        type: string
+        example: TOP
+      matchId: 
+        type: string
+        example: KR_6415550734
+      pentaKills: 
+        type: integer
+        example: 0
+      perks: 
+        $ref: "#/definitions/Perks"
+      puuid: 
+        type: string
+        description: "Summoner's puuid"
+      quadraKills: 
+        type: integer
+        example: 0
+      summonerLevel: 
+        type: integer
+        example: 415
+      teamId: 
+        type: integer
+        example: 100
+      totalDamageDealtToChampions: 
+        type: integer
+        example: 12079
+      otalDamageTaken: 
+        type: integer
+        example:  20853
+      tripleKills: 
+        type: integer
+        example:  0
+      visionWardsBoughtInGame: 
+        type: integer
+        example:  2
+      wardsKilled: 
+        type: integer
+        example:  2
+      wardsPlaced:  
+        type: integer
+        example: 7
+      win:  
+        type: string
+        example: false
+  Ban:
+    type: object
+    properties:
+      championId:
+        type: integer
+        example: 53
+        description: -1 if summoner banned no champion.
+      pickTurn:
+        type: integer
+        example: 1
+  Timeline:
+    type: object
+    properties:
+      itemBuild:
+        type: string
+        example: "game_duration_minute : [ itemCode ]"
+        description: The example describes for the brief itemBuild object. not returns string.
+      matchId:
+        type: string
+        example: KR_6415550734
+      participantId:
+        type: integer
+        example: 1
+      puuid: 
+        type: string
+      skillBuild: 
+        type: array
+        items:
+          type: integer
+        example: [ 3, 2, 1,1,1,4,3,3,3,3,4,1,1,2,2,4 ]
+        description: Skill level up turns per level
+        
+  Perk:
+    type: object
+    properties:
+      statPerks: 
+        type: object
+        properties:
+          defense:
+            type: integer
+            example: 5002
+          flex:
+            type: integer
+            example: 5008
+          offense:
+            type: integer
+            example: 5008
+      styles:
+        type: array
+        items:
+          $ref: '#/definitions/PerkStyle'
+         
+  PerkStyle:
+    type: object
+    properties:
+      desciprtion:
+        type: string
+        example: "primaryStyle"
+      selections:
+        type: array
+        items:
+          $ref: '#/definitions/PerkStyleSelection'
+
+  Ingame:
+    type: object
+    properties:
+      bannedChampions:
+        type: array
+        items:
+          $ref: '#/definitions/bannedChampion' 
+      gameId:
+        type: integer
+        example: 6415869425
+      gameLength:
+        type: integer
+        example:  248
+      gameMode:
+        type: string
+        example: CLASSIC
+      gameQueueConfigId:
+        type: integer
+        example:  420
+      gameStartTime:
+        type: integer
+        example:  1679468283774
+      gameType:
+        type: string
+        example: MATCHED_GAME
+      mapId:
+        type: integer
+        example:  11
+      participants:
+        type: array
+        items:
+          $ref: '#/definitions/Participant' 
+      platformId:
+        type: string
+        example: KR
+
+  bannedChampion:
+    type: object
+    properties:
+      championId:
+        type: integer
+        example: 76
+      pickTurn:
+        type: integer
+        example: 1
+      teamId:
+        type: integer
+        example: 100
+
+  PerkStyleSelection:
+    type: object
+    properties:
+      perk:
+        type: integer
+        example: 8437
+      var1:
+        type: integer
+        example:  532
+      var2:
+        type: integer
+        example:  345
+      var3:
+        type: integer
+        example: 0
+  Team:
+    type: object
+    properties:
+      bans:
+        type: array
+        items:
+          $ref: '#/definitions/Ban'
+      baron:
+        type: integer
+        example:  1
+      dragon:
+        type: integer
+        example:   0
+      matchId:
+        type: string
+        example: KR_6415550734
+      teamId:
+        type: integer
+        example: 100
+      totalKills:
+        type: integer
+        example: 31
+      tower:
+        type: integer
+        example: 10
+      win:
+        type: boolean
+        example: true
+
+  Match:
+    id: MatchInfo
+    type: object
+    properties:
+      match:
+        type: object
+        properties:
+          gameCreation:
+            type: integer
+            example: 1679420455246
+          gameDuration:
+            type: integer
+            example: 1788
+          matchId:
+            type: string
+            example: KR_6415550734
+          queueId:
+            type: integer
+            example: 420
+      participants:
+        type: array
+        items:
+          $ref: '#/definitions/Participant'
+
+      teams:
+        type: array
+        items:
+          $ref: '#/definitions/Team'
+      timelines:
+        type: array
+        items:
+          $ref: '#/definitions/Timeline'
+
+  SummonerAndMatch:
+    type: object
+    properties:
+      summoner:
+        $ref: '#/definitions/SummonerInfo'
+      matches:
+        type: array
+        items:
+          $ref: '#/definitions/Match'
+      ingame:
+        schema:
+          $ref: '#/definitions/Ingame'
+        
+  
+responses:
+  200:
+    examples:
+      application/json:
+        schema:
+          $ref: '#/definitions/SummonerAndMatch'
+  400:
+    description: Invalid Request or Server Error raised
+    schema:
+      type: object
+      properties:
+        error_type: 
+          type: string
+          example: Invalid Request Error
+        message: 
+          type: string
+          example: put the valid vlaue as to API Requiremnets.
+

@@ -1,0 +1,63 @@
+tags:
+  - LeagueEntry
+
+definitions:
+  LeagueEntry:
+    type: object
+    properties:
+      freshBlood: 
+        type: boolean
+        example: false
+      hotStreak: 
+        type: boolean
+        example: true
+      inactive: 
+        type: boolean
+        example: false
+      leaguePoints: 
+        type: integer
+        example: 1593
+      losses: 
+        type: integer
+        example: 155
+      queue: 
+        type: string
+        example: challenger
+      rank: 
+        type: integer
+        example: 1
+      summonerId: 
+        type: string
+        decription: Encrypted Summoner's Id
+      summonerName: 
+        type: string
+        example: SnowFlow2r
+      tier: 
+        type: string
+        example: I
+      veteran: 
+        type: boolean
+        example: true
+      wins: 
+        type: integer
+        example: 223
+  LeagueEntries:
+    type: array
+    items:
+      $ref: '#/definitions/LeagueEntry'
+responses:
+  200:
+    schema:
+      $ref: '#/definitions/LeagueEntries'
+  400:
+    description: Server Error raised
+    schema:
+      type: object
+      properties:
+        error_type: 
+          type: string
+          example: Invalid Request Error
+        message: 
+          type: string
+          example: put the valid vlaue as to API Requiremnets.
+
